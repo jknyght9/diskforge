@@ -6,8 +6,8 @@ rm -f /output/*.img
 sleep 1
 
 # Disk image filenames
-MBR_DISK="mbr_disk.img"
-GPT_DISK="gpt_disk.img"
+MBR_DISK="mbr_disk_example.img"
+GPT_DISK="gpt_disk_example.img"
 DISK_SIZE=512M  # Adjust as needed
 
 # Create empty disk images
@@ -107,7 +107,7 @@ losetup -d $GPT_LOOP
 kpartx -d $MBR_LOOP
 kpartx -d $GPT_LOOP
 
-mv /mbr_disk.img /output/mbr_disk.img
-mv /gpt_disk.img /output/gpt_disk.img
+mv /${MBR_DISK} /output/${MBR_DISK}
+mv /${GPT_DISK} /output/${GPT_DISK}
 
 echo "Disk images created successfully!"
