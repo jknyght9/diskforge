@@ -21,7 +21,7 @@ Use the docker file to build out the image files.
 docker build -t disk-image-example
 
 # Build the image files
-docker run --rm --privileged -v $(pwd)/output:/output disk-image-example
+docker run --rm --privileged -v $(pwd)/output:/output -v $(pwd)/files:/files disk-image-example
 ```
 
 ## Analyzing Images

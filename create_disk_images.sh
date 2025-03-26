@@ -49,7 +49,7 @@ p
 +100M
 t
 3
-83
+7
 
 n
 p
@@ -57,7 +57,7 @@ p
 +100M
 t
 4
-7
+83
 
 w
 EOF
@@ -72,8 +72,8 @@ kpartx -a $MBR_LOOP  # Map partitions
 echo "Formatting MBR partitions..."
 mkfs.vfat -F32 -n "MBR_FAT32" /dev/mapper/$(basename ${MBR_LOOP})p1
 mkfs.ntfs -f -L "MBR_NTFS" /dev/mapper/$(basename ${MBR_LOOP})p2
-mkfs.ext3 -L "MBR_EXT3" /dev/mapper/$(basename ${MBR_LOOP})p3
-mkfs.exfat -n "MBR_EXFAT" /dev/mapper/$(basename ${MBR_LOOP})p4
+mkfs.exfat -n "MBR_EXFAT" /dev/mapper/$(basename ${MBR_LOOP})p3
+mkfs.ext3 -L "MBR_EXT3" /dev/mapper/$(basename ${MBR_LOOP})p4
 
 echo "MBR Partitioning and formatting complete!"
 
@@ -84,8 +84,8 @@ echo "Creating GPT partition table..."
 parted -s $GPT_LOOP mklabel gpt
 parted -s $GPT_LOOP mkpart primary fat32 1MiB 101MiB
 parted -s $GPT_LOOP mkpart primary ntfs 101MiB 201MiB
-parted -s $GPT_LOOP mkpart primary ext3 201MiB 301MiB
-parted -s $GPT_LOOP mkpart primary 301MiB 401MiB
+parted -s $GPT_LOOP mkpart primary 201MiB 301MiB
+parted -s $GPT_LOOP mkpart primary ext3 301MiB 401MiB
 
 echo "Refreshing GPT partition table..."
 kpartx -a $GPT_LOOP 
@@ -94,8 +94,8 @@ kpartx -a $GPT_LOOP
 echo "Formatting GPT partitions..."
 mkfs.vfat -F32 -n "GPT_FAT32" /dev/mapper/$(basename ${GPT_LOOP})p1
 mkfs.ntfs -f -L "GPT_NTFS" /dev/mapper/$(basename ${GPT_LOOP})p2
-mkfs.ext3 -L "GPT_EXT3" /dev/mapper/$(basename ${GPT_LOOP})p3
-mkfs.exfat -n "GPT_EXFAT" /dev/mapper/$(basename ${GPT_LOOP})p4
+mkfs.exfat -n "GPT_EXFAT" /dev/mapper/$(basename ${GPT_LOOP})p3
+mkfs.ext3 -L "GPT_EXT3" /dev/mapper/$(basename ${GPT_LOOP})p4
 
 echo "GPT Partitioning and formatting complete!"
 
