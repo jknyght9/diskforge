@@ -36,6 +36,8 @@ function mount_and_populate {
         echo "    Copying files to $MOUNT_POINT"
         cp -av "$FILES_DIR"/* "$MOUNT_POINT"
 
+        sync 
+
         echo "    Deleting doc1.docx to simulate deletion"
         rm -f "$MOUNT_POINT/doc1.docx"
 
