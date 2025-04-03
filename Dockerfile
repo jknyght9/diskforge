@@ -1,19 +1,23 @@
-# Use Debian-based Linux
 # Bullseye for macOS compatability
+# Use Debian Bullseye for better compatibility
 FROM debian:bullseye
 
-# Install required utilities
+# Install required system packages
 RUN apt-get update && apt-get install -y \
-    fdisk parted dosfstools exfatprogs exfat-fuse fuse ntfs-3g kpartx e2fsprogs sleuthkit udev util-linux \
+    python3 python3-pip \
+    parted fdisk dosfstools exfatprogs exfat-fuse ntfs-3g \
+    kpartx e2fsprogs sleuthkit udev util-linux xfsprogs \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy the script into the container
-COPY create_disk_images.sh /usr/local/bin/create_disk_images.sh
-RUN chmod +x /usr/local/bin/create_disk_images.sh
+# Create work directory
+WORKDIR /app
 
-# Copy the populate script into the container
-COPY populate_disk_images.sh /usr/local/bin/populate_disk_images.sh 
-RUN chmod +x /usr/local/bin/populate_disk_images.sh
+# Copy your Python builder framework
+COPY disk_builder.py .
 
-# Run the script on container start
-CMD ["/bin/bash", "-c", "/usr/local/bin/create_disk_images.sh && /usr/local/bin/populate_disk_images.sh"]
+# Default volume mount locations for files and output
+VOLUME ["/files", "/output"]
+
+# Entrypoint example (can be overridden)
+ENTRYPOINT ["python3", "disk_builder.py"]
+#CMD ["python3", "disk_builder.py"]
