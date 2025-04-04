@@ -12,7 +12,6 @@ class DiskBuilder:
         self.disks = []
 
     def run(self):
-        # Clean up old .img files
         output_dir = Path("/output")
         output_dir.mkdir(exist_ok=True)
         for img_file in output_dir.glob("*.img"):
@@ -63,12 +62,6 @@ class DiskBuilder:
                         matched_files = glob.glob(file_entry["source"])
                         if not matched_files:
                             self.fail(f"No matching files for pattern: {file_entry['source']}")
-
-
-                #if "populate" in part:
-                #    for file_entry in part["populate"].get("add_files", []):
-                #        if not os.path.exists(file_entry["source"]):
-                 #           self.fail(f"File does not exist: {file_entry['source']}")
 
     def create_disk_image(self, disk):
         disk_path = f"output/{disk['name']}.img"
