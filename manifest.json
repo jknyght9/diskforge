@@ -17,8 +17,7 @@
           "bootable": true,
           "populate": {
             "add_files": [
-              { "source": "/files/text1.txt", "target": "/" },
-              { "source": "/files/images/pic1.jpg", "target": "/images/" }
+              { "source": "/files/*", "target": "/"}
             ],
             "delete_files": ["/text1.txt"]
           }
@@ -47,7 +46,7 @@
         {
           "number": 4,
           "type": "extended",
-          "filesystem": "null",
+          "filesystem": null,
           "size": "100M",
           "partitions": [
             {
