@@ -13,11 +13,12 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copy your Python builder framework
-COPY disk_builder.py .
+COPY diskbuilder/ diskbuilder/
+COPY main.py .
 
 # Default volume mount locations for files and output
 VOLUME ["/files", "/output"]
 
 # Entrypoint example (can be overridden)
-ENTRYPOINT ["python3", "disk_builder.py"]
+ENTRYPOINT ["python3", "main.py"]
 #CMD ["python3", "disk_builder.py"]

@@ -1,38 +1,157 @@
-# MBR/GPT Example Disk Image Creator
+# DiskBuilder
 
-This project creates a 512 MB disk image for both MBR and GPT partitioning schemes. It also creates four partitions and formats them with the following configuration:
+**DiskBuilder** is a flexible Python-based tool for generating partitioned disk images (MBR and GPT) for use in digital forensics training, incident response simulations, lab environments, or automated system provisioning.
 
-| Filesystem  | Size  |
-| ----------- | ----- |
-| FAT32       | +200M |
-| NTFS        | +200M |
-| Ext3        | +200M |
-| exFAT       | +200M |
-| Unallocated | ~     |
+It uses a JSON manifest to define disk layouts, filesystems, population rules (add, delete, move), and bootable flags. It supports building and populating multiple disk images at once using a containerized workflow.
 
-The purpose of this project is to familiarize students with MBR and GPT partitioning scheme.
+---
 
-## Usage
+## Features
 
-Use the docker file to build out the image files.
+- ✅ MBR and GPT partition table support
+- ✅ Primary, extended, and logical partitions
+- ✅ Multiple filesystem formats: `FAT32`, `NTFS`, `EXT2/3/4`, `XFS`, `EXFAT`
+- ✅ Populate files into partitions
+- ✅ Delete files or directories (with wildcard support)
+- ✅ Move files after population
+- ✅ Build multiple disk images from a single manifest
+- ✅ Dockerized and reproducible
 
-```sh
-# Build the container
-docker build -t disk-image-example
+---
 
-# Build the image files
-docker run --rm --privileged -v $(pwd)/output:/output -v $(pwd)/files:/files disk-image-example
+## Use Cases
+
+- Digital forensics labs (e.g., deleted file recovery)
+- Simulated data breach or whistleblower scenarios
+- Disk images for malware analysis or CTF challenges
+- Teaching filesystem and partition concepts
+
+---
+
+## 🐳 Docker Requirements
+
+This tool uses loopback devices and requires `--privileged` mode when running Docker.
+
+---
+
+## 🚀 Quick Start
+
+### 1. Clone the repo
+
+```bash
+git clone https://github.com/your-org/diskbuilder.git
+cd diskbuilder
 ```
+
+### 2. Add your files
+
+Place files to embed inside disk images in the `files/` directory.
+
+```
+files/
+├── text1.txt
+├── Contracts/
+│   └── Vendor_Contract.docx
+└── Notes/
+    └── password_list.txt
+```
+
+### 3. Define your disk layout in `manifest.json`
+
+```json
+{
+  "schema_version": "1.0",
+  "disks": [
+    {
+      "name": "usb-training",
+      "type": "MBR",
+      "size": "512M",
+      "partitions": [
+        {
+          "number": 1,
+          "type": "primary",
+          "filesystem": "fat32",
+          "size": "100M",
+          "populate": {
+            "add_files": [{ "source": "/files/*", "target": "/" }],
+            "move_files": [
+              {
+                "source": "/Contracts/Vendor_Contract.docx",
+                "target": "/Vendor.docx"
+              }
+            ],
+            "delete_files": ["/Notes/*"]
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+### 4. Build with Docker
+
+```bash
+docker build -t disk-builder .
+docker run --rm --privileged \
+  -v "$(pwd)/manifest.json:/app/manifest.json" \
+  -v "$(pwd)/files:/files" \
+  -v "$(pwd)/output:/output" \
+  disk-builder manifest.json
+```
+
+Output `.img` files will be placed in the `output/` directory.
+
+---
+
+## Manifest Structure
+
+Each disk entry must include:
+
+```json
+{
+  "name": "disk-name",
+  "type": "MBR|GPT",
+  "size": "512M|32G|...",
+  "bootable": false,
+  "partitions": [ ... ]
+}
+```
+
+Each partition may include:
+
+- `filesystem`: One of `fat32`, `ntfs`, `ext2`, `ext3`, `ext4`, `xfs`, `exfat`
+- `populate`:
+  - `add_files`: Copy files from host into image
+  - `move_files`: Move populated files to new locations within the image
+  - `delete_files`: Remove files or directories, with `*` wildcard support
+
+---
+
+## 📁 Folder Structure
+
+```
+.
+├── files/           # Files to include in images
+├── output/          # Resulting disk images
+├── manifest.json    # Disk layout and population manifest
+├── Dockerfile
+├── main.py
+├── diskbuilder/     # Core Python source files
+└── examples/        # Example manifest templates
+```
+
+---
 
 ## Analyzing Images
 
-> Install **sleuthkit** and run the following commands.
+Use **The Sleuthkit** and a hexeditor like **xxd** to view and analyze your newly created images.
 
-View the partition tables.
+### View the partition tables.
 
 ```sh
 # Partition tables for MBR and GPT
-usename@hostname:/$ mmls output/mbr_disk.img
+usename@hostname:/$ mmls output/EXAMPLEDISK.img
 
 DOS Partition Table
 Offset Sector: 0
@@ -47,32 +166,13 @@ Units are in 512-byte sectors
 005:  000:003   0000616448   0000821247   0000204800   NTFS / exFAT (0x07)
 006:  -------   0000821248   0001048575   0000227328   Unallocated
 
-
-username@hostname:/$ mmls output/gpt_disk.img
-
-GUID Partition Table (EFI)
-Offset Sector: 0
-Units are in 512-byte sectors
-
-      Slot      Start        End          Length       Description
-000:  Meta      0000000000   0000000000   0000000001   Safety Table
-001:  -------   0000000000   0000002047   0000002048   Unallocated
-002:  Meta      0000000001   0000000001   0000000001   GPT Header
-003:  Meta      0000000002   0000000033   0000000032   Partition Table
-004:  000       0000002048   0000206847   0000204800   primary
-005:  001       0000206848   0000411647   0000204800   primary
-006:  002       0000411648   0000616447   0000204800   primary
-007:  003       0000616448   0000821247   0000204800   primary
-008:  -------   0000821248   0001048575   0000227328   Unallocated
-
 ```
 
-View the first partition in both MBR and GPT images.
+### View the first partition in both MBR and GPT images.
 
 ```sh
 # FAT32 partition for MBR and GPT
-
-username@hostname:/$ fsstat -o 2048 output/mbr_disk.img
+username@hostname:/$ fsstat -o 2048 output/EXAMPLEDISK.img
 
 FILE SYSTEM INFORMATION
 --------------------------------------------
@@ -114,55 +214,13 @@ Total Cluster Range: 2 - 201617
 FAT CONTENTS (in sectors)
 --------------------------------------------
 3184-3184 (1) -> EOF
-
-username@hostname:/$ fsstat -o 2048 output/gpt_disk.img
-
-FILE SYSTEM INFORMATION
---------------------------------------------
-File System Type: FAT32
-
-OEM Name: mkfs.fat
-Volume ID: 0x97fb0c26
-Volume Label (Boot Sector): GPT_FAT32
-Volume Label (Root Directory): GPT_FAT32
-File System Type Label: FAT32
-Next Free Sector (FS Info): 3184
-Free Sector Count (FS Info): 201615
-
-Sectors before file system: 0
-
-File System Layout (in sectors)
-Total Range: 0 - 204799
-* Reserved: 0 - 31
-** Boot Sector: 0
-** FS Info Sector: 1
-** Backup Boot Sector: 6
-* FAT 0: 32 - 1607
-* FAT 1: 1608 - 3183
-* Data Area: 3184 - 204799
-** Cluster Area: 3184 - 204799
-*** Root Directory: 3184 - 3184
-
-METADATA INFORMATION
---------------------------------------------
-Range: 2 - 3225862
-Root Directory: 2
-
-CONTENT INFORMATION
---------------------------------------------
-Sector Size: 512
-Cluster Size: 512
-Total Cluster Range: 2 - 201617
-
-FAT CONTENTS (in sectors)
---------------------------------------------
-3184-3184 (1) -> EOF
 ```
 
-Use a hexeditor to view the first 512 bytes of the MBR partition.
+### Use a hexeditor to view the first 512 bytes of the MBR partition.
 
 ```sh
-username@hostname:/$ xxd -l 512 -g 1 output/mbr_disk.img
+# Use xxd to view the iamge data
+username@hostname:/$ xxd -l 512 -g 1 output/EXAMPLEDISK.img
 
 00000000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
 00000010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
@@ -198,15 +256,18 @@ username@hostname:/$ xxd -l 512 -g 1 output/mbr_disk.img
 000001f0: 39 26 07 1e 2b 33 00 68 09 00 00 20 03 00 55 aa  9&..+3.h... ..U.
 ```
 
-Use a hexeditor to read the GPT header in sector 1.
+---
 
-```sh
-username@hostname:/$ xxd -l 92 -g 1 -s 512 output/gpt_disk.img
+## ⚖️ Legal / License
 
-00000200: 45 46 49 20 50 41 52 54 00 00 01 00 5c 00 00 00  EFI PART....\...
-00000210: e1 6f c0 b0 00 00 00 00 01 00 00 00 00 00 00 00  .o..............
-00000220: ff ff 0f 00 00 00 00 00 22 00 00 00 00 00 00 00  ........".......
-00000230: de ff 0f 00 00 00 00 00 23 b0 30 15 13 9f 52 4b  ........#.0...RK
-00000240: a1 e5 57 ba f4 62 d0 1e 02 00 00 00 00 00 00 00  ..W..b..........
-00000250: 80 00 00 00 80 00 00 00 75 e9 42 82              ........u.B.
-```
+This project is open source and distributed under the MIT License.
+
+> This software is provided "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and noninfringement. In no event shall the authors be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the software.
+
+---
+
+## 👨‍💻 Author
+
+Created by Jacob Stauffer | CISSP, GCFA, GREM, OSCP — Contributions and PRs welcome!
+
+<a href="https://www.buymeacoffee.com/jstauffer" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
