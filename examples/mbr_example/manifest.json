@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.0",
+  "disks": [
+    {
+      "name": "training_mbr",
+      "label": "MBRExample",
+      "type": "MBR",
+      "size": "512M",
+      "bootable": true,
+      "partitions": [
+        {
+          "number": 1,
+          "type": "primary",
+          "filesystem": "fat32",
+          "label": "BOOT",
+          "size": "100M",
+          "bootable": true,
+          "populate": {
+            "add_files": [{ "source": "/files/*", "target": "/" }],
+            "delete_files": ["/text1.txt"]
+          }
+        },
+        {
+          "number": 2,
+          "type": "primary",
+          "filesystem": "ntfs",
+          "label": "DATA",
+          "size": "100M",
+          "populate": {
+            "add_files": [{ "source": "/files/*", "target": "/" }],
+            "delete_files": ["/text1.txt"]
+          }
+        },
+        {
+          "number": 3,
+          "type": "primary",
+          "filesystem": "ext4",
+          "label": "LINUX_FS",
+          "size": "100M",
+          "populate": {
+            "add_files": [{ "source": "/files/*", "target": "/" }],
+            "delete_files": ["/text1.txt"]
+          }
+        },
+        {
+          "number": 4,
+          "type": "extended",
+          "filesystem": null,
+          "size": "100M",
+          "partitions": [
+            {
+              "number": 5,
+              "type": "logical",
+              "filesystem": "xfs",
+              "label": "XFS_LOGICAL",
+              "size": "100M",
+              "populate": {
+                "add_files": [{ "source": "/files/*", "target": "/" }],
+                "delete_files": ["/text1.txt"]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

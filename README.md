@@ -28,6 +28,15 @@ It uses a JSON manifest to define disk layouts, filesystems, population rules (a
 
 ---
 
+## Examples
+
+You can find real-world examples of manifest files in the examples/ folder.
+
+- examples/mbr_example/manifest.json: MBR image with FAT32, NTFS, exFAT, and XFS partitions
+- examples/gpt_example/manifest.json: GPT image with FAT32, NTFS, exFAT, and XFS partitions
+
+---
+
 ## 🐳 Docker Requirements
 
 This tool uses loopback devices and requires `--privileged` mode when running Docker.
@@ -151,7 +160,7 @@ Use **The Sleuthkit** and a hexeditor like **xxd** to view and analyze your newl
 
 ```sh
 # Partition tables for MBR and GPT
-usename@hostname:/$ mmls output/EXAMPLEDISK.img
+usename@hostname:/$ mmls examples/mbr_example/training_mbr.img
 
 DOS Partition Table
 Offset Sector: 0
@@ -172,7 +181,7 @@ Units are in 512-byte sectors
 
 ```sh
 # FAT32 partition for MBR and GPT
-username@hostname:/$ fsstat -o 2048 output/EXAMPLEDISK.img
+username@hostname:/$ fsstat -o 2048 examples/mbr_example/training_mbr.img
 
 FILE SYSTEM INFORMATION
 --------------------------------------------
@@ -220,7 +229,7 @@ FAT CONTENTS (in sectors)
 
 ```sh
 # Use xxd to view the iamge data
-username@hostname:/$ xxd -l 512 -g 1 output/EXAMPLEDISK.img
+username@hostname:/$ xxd -l 512 -g 1 examples/mbr_examples/training_mbr.img
 
 00000000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
 00000010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
