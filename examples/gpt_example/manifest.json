@@ -12,7 +12,7 @@
           "number": 1,
           "type": "primary",
           "filesystem": "fat32",
-          "label": "BOOT",
+          "label": "GPT_FAT32",
           "size": "100M",
           "bootable": true,
           "populate": {
@@ -24,7 +24,7 @@
           "number": 2,
           "type": "primary",
           "filesystem": "ntfs",
-          "label": "DATA",
+          "label": "GPT_NTFS",
           "size": "100M",
           "populate": {
             "add_files": [{ "source": "/files/*", "target": "/" }],
@@ -34,8 +34,8 @@
         {
           "number": 3,
           "type": "primary",
-          "filesystem": "ext4",
-          "label": "LINUX_FS",
+          "filesystem": "exfat",
+          "label": "GPT_EXFAT",
           "size": "100M",
           "populate": {
             "add_files": [{ "source": "/files/*", "target": "/" }],
@@ -45,8 +45,8 @@
         {
           "number": 4,
           "type": "primary",
-          "filesystem": "xfs",
-          "label": "XFS_LOGICAL",
+          "filesystem": "ext3",
+          "label": "GPT_EXT3",
           "size": "100M",
           "populate": {
             "add_files": [{ "source": "/files/*", "target": "/" }],

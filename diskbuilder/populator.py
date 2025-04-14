@@ -17,7 +17,15 @@ def populate_disk(disk):
         os.makedirs(mount_point, exist_ok=True)
 
         try:
-            subprocess.run(["mount", part["_dev"], str(mount_point)], check=True)
+            if fs == "exfat":
+                try:
+                    subprocess.run(["fuse.exfat", part["_dev"], str(mount_point)], check=True)
+                except:
+                    print(f"❌ Failed to mount {part['_dev']} as exfat using fuse.exfat.")
+                    return
+            else:
+                subprocess.run(["mount", part["_dev"], str(mount_point)], check=True)
+            
             populate = part.get("populate", {})
 
             # Add files 
@@ -79,6 +87,9 @@ def populate_disk(disk):
                         dir_path.rmdir()
                     except OSError:
                         pass
+
+            # Flush all file data to disk
+            subprocess.run(["sync"], check=True)
 
         finally:
             subprocess.run(["umount", str(mount_point)], check=True)
