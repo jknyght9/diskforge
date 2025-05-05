@@ -1,4 +1,5 @@
 .DS_Store
 output/
 scenarios/
-*.img
+test/
+**/*.img
