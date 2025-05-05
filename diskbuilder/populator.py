@@ -1,4 +1,4 @@
-import glob, os, shutil, subprocess
+import glob, os, shutil, subprocess, sys
 from pathlib import Path
 
 def populate_disk(disk):
@@ -13,13 +13,14 @@ def populate_disk(disk):
         if fs in ("", "none", "null"):
             return
         partnum = part["number"]
+        partlabel = part["label"]
         mount_point = mount_base / f"{disk['name']}_part{partnum}"
         os.makedirs(mount_point, exist_ok=True)
 
         try:
             if fs == "exfat":
                 try:
-                    subprocess.run(["fuse.exfat", part["_dev"], str(mount_point)], check=True)
+                    subprocess.run(["mount.exfat-fuse", part["_dev"], str(mount_point)], check=True)
                 except:
                     print(f"❌ Failed to mount {part['_dev']} as exfat using fuse.exfat.")
                     return
@@ -28,11 +29,11 @@ def populate_disk(disk):
             
             populate = part.get("populate", {})
 
-            # Add files 
+            # Add files
+            print(f"[~] Adding files to {partlabel}", file=sys.stdout, flush=True)
             for file_entry in populate.get("add_files", []):
                 target_path = mount_point / file_entry["target"].lstrip("/")
                 target_path.parent.mkdir(parents=True, exist_ok=True)
-                #subprocess.run(["cp", "-av", file_entry["source"], str(target_path)], check=True)
 
                 sources = glob.glob(file_entry["source"])
                 if not sources:
@@ -48,6 +49,7 @@ def populate_disk(disk):
             subprocess.run(["sync"], check=True)
 
             # Copy files
+            print(f"[~] Copying files on {partlabel}", file=sys.stdout, flush=True)
             for copy in populate.get("copy_files", []):
                 src_path = mount_point / copy["source"].lstrip("/")
                 dst_path = mount_point / copy["target"].lstrip("/")
@@ -59,6 +61,7 @@ def populate_disk(disk):
             subprocess.run(["sync"], check=True)
 
             # Move files
+            print(f"[~] Moving files on {partlabel}", file=sys.stdout, flush=True)
             for move in populate.get("move_files", []):
                 src_path = mount_point / move["source"].lstrip("/")
                 dst_path = mount_point / move["target"].lstrip("/")
@@ -70,6 +73,7 @@ def populate_disk(disk):
             subprocess.run(["sync"], check=True)
 
             # Delete files
+            print(f"[~] Deleting files on {partlabel}", file=sys.stdout, flush=True)
             for del_path in populate.get("delete_files", []):
                 full_glob = str(mount_point / del_path.lstrip("/"))
                 for path in glob.glob(full_glob):
@@ -94,6 +98,10 @@ def populate_disk(disk):
         finally:
             subprocess.run(["umount", str(mount_point)], check=True)
             os.rmdir(mount_point)
+            if (part.get("_luks_open") and part.get("_luks_name")):
+                subprocess.run(["cryptsetup", "close", part["_luks_name"]], check=True)
+            if part.get("_veracrypt_mounted") and part.get("_veracrypt_mount_path"):
+                subprocess.run(["veracrypt", "--text", "--dismount", part["_veracrypt_mount_path"]], check=True)
 
     for part in disk["partitions"]:
         if part["type"] == "extended":

@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "disks": [
+    {
+      "name": "training_veracrypt",
+      "label": "VERAExample",
+      "type": "GPT",
+      "size": "512M",
+      "bootable": true,
+      "encrypt": {
+        "type": "veracrypt",
+        "passphrase": "secret123"
+      },
+      "partitions": [
+        {
+          "number": 1,
+          "type": "primary",
+          "filesystem": "ext4",
+          "label": "VERA_EXT4",
+          "size": "500M",
+          "bootable": true,
+          "populate": {
+            "add_files": [{ "source": "/files/*", "target": "/" }],
+            "delete_files": ["/text1.txt"]
+          }
+        }
+      ]
+    }
+  ]
+}

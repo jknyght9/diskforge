@@ -1,9 +1,8 @@
-import os
-import subprocess
-from diskbuilder.utils import fail
+import os, subprocess, sys
+from diskbuilder.utils import fail,wait_for_device
 
 def partition_and_format_disk(disk):
-    print(f"[*] Partitioning disk: {disk['name']}")
+    print(f"[*] Partitioning disk: {disk['name']}", file=sys.stdout, flush=True)
     disk_path = disk["_path"]
     loopdev = disk["_loopdev"]
 
@@ -25,29 +24,95 @@ def assign_and_format(part, disk, loopdev):
 
     partnum = part["number"]
     partdev = f"/dev/mapper/{os.path.basename(loopdev)}p{partnum}"
+    wait_for_device(partdev)
+
     part["_dev"] = partdev
     label = part.get("label", f"{disk['name']}_part{partnum}")
     fs = part.get("filesystem", "").lower()
+    encrypt_cfg = part.get("encrypt", {})
 
     if fs in ("", "none", "null"):
         print(f"    Skipping formatting of partition {partnum} (no filesystem)")
         return
 
+    # LUKS encryption
+    if encrypt_cfg.get("type") == "luks":
+        passphrase = encrypt_cfg.get("passphrase", "").encode()
+        luks_name = f"luks_{disk['name']}_part{partnum}"
+        mapped_path = f"/dev/mapper/{luks_name}"
+
+        print(f"    Encrypting partition {partnum} with LUKS...")
+        subprocess.run(["cryptsetup", "luksFormat", partdev, "-q"], input=passphrase, check=True)
+        subprocess.run(["cryptsetup", "open", partdev, luks_name], input=passphrase, check=True)
+        wait_for_device(mapped_path)
+
+        part["_dev"] = mapped_path
+        part["_luks_name"] = luks_name  # Store name for later closure
+        part["_luks_open"] = True
+
+    # VERACRYPT encryption
+    elif encrypt_cfg.get("type") == "veracrypt":
+        passphrase = encrypt_cfg.get("passphrase", "")
+        loopdev = disk["_loopdev"]
+        mount_path = f"/mnt/veracrypt_{disk['name']}"
+        os.makedirs(mount_path, exist_ok=True)
+
+        print(f"    Encrypting full disk with VeraCrypt on {loopdev}")
+
+            # Ensure device is free
+        subprocess.run(["losetup", "-d", loopdev], check=False)
+        subprocess.run(["losetup", "--find", "--show", disk["_path"]], check=True)  # re-attach cleanly
+        loopdev = subprocess.check_output(["losetup", "--find", "--show", disk["_path"]]).decode().strip()
+        disk["_loopdev"] = loopdev
+
+        # Create encrypted volume
+        subprocess.run([
+            "veracrypt", "--text", "--create", loopdev,
+            "--volume-type", "normal",
+            "--encryption", "AES", 
+            "--hash", "SHA-512",
+            "--filesystem", fs,
+            "--password", passphrase,
+            "--pim", "0", 
+            "--keyfiles", "",
+            "--non-interactive",
+            "--quick"
+        ], check=True)
+
+        # Mount VeraCrypt volume to container path
+        subprocess.run([
+            "veracrypt", "--text", "--mount", loopdev, mount_path,
+            "--password", passphrase, 
+            "--pim", "0", 
+            "--keyfiles", "",
+            "--non-interactive",
+            "--mount-options=system"
+        ], check=True)
+        wait_for_device(mount_path)
+
+        part["_dev"] = mount_path
+        part["_veracrypt_mounted"] = True
+        part["_veracrypt_mount_path"] = mount_path
+        return
+
+    # Final device to format
+    dev_to_format = part["_dev"]
+
     print(f"    Formatting partition {partnum} as {fs}")
     if fs == "fat32":
-        subprocess.run(["mkfs.vfat", "-F32", "-n", label, partdev], check=True)
+        subprocess.run(["mkfs.vfat", "-F32", "-n", label, dev_to_format], check=True)
     elif fs == "ntfs":
-        subprocess.run(["mkfs.ntfs", "-f", "-L", label, partdev], check=True)
+        subprocess.run(["mkfs.ntfs", "-f", "-L", label, dev_to_format], check=True)
     elif fs == "ext2":
-        subprocess.run(["mkfs.ext2", "-L", label, partdev], check=True)
+        subprocess.run(["mkfs.ext2", "-L", label, dev_to_format], check=True)
     elif fs == "ext3":
-        subprocess.run(["mkfs.ext3", "-L", label, partdev], check=True)
+        subprocess.run(["mkfs.ext3", "-L", label, dev_to_format], check=True)
     elif fs == "ext4":
-        subprocess.run(["mkfs.ext4", "-L", label, partdev], check=True)
+        subprocess.run(["mkfs.ext4", "-L", label, dev_to_format], check=True)
     elif fs == "xfs":
-        subprocess.run(["mkfs.xfs", "-L", label, partdev], check=True)
+        subprocess.run(["mkfs.xfs", "-L", label, dev_to_format], check=True)
     elif fs == "exfat":
-        subprocess.run(["mkfs.exfat", "-n", label, partdev], check=True)
+        subprocess.run(["mkfs.exfat", "-n", label, dev_to_format], check=True)
     else:
         self.fail(f"Unsupported filesystem: {fs}")
 

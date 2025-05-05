@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "disks": [
+    {
+      "name": "training_luks",
+      "label": "LUKSExample",
+      "type": "GPT",
+      "size": "512M",
+      "bootable": true,
+      "partitions": [
+        {
+          "number": 1,
+          "type": "primary",
+          "filesystem": "ext4",
+          "label": "LUKS_EXT4",
+          "size": "500M",
+          "bootable": true,
+          "populate": {
+            "add_files": [{ "source": "/files/*", "target": "/" }],
+            "delete_files": ["/text1.txt"]
+          },
+          "encrypt": {
+            "type": "luks",
+            "passphrase": "secret123"
+          }
+        }
+      ]
+    }
+  ]
+}
