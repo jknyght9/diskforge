@@ -38,11 +38,26 @@ def assign_and_format(part, disk, loopdev):
     # LUKS encryption
     if encrypt_cfg.get("type") == "luks":
         passphrase = encrypt_cfg.get("passphrase", "").encode()
+        luks_version = encrypt_cfg.get("version", "1")
+        if luks_version not in ["1", "2"]:
+            fail(f"Invalid LUKS version '{luks_version}' in disk '{disk['name']}' partition {partnum}. Supported: 1, 2")
+
         luks_name = f"luks_{disk['name']}_part{partnum}"
         mapped_path = f"/dev/mapper/{luks_name}"
 
-        print(f"    Encrypting partition {partnum} with LUKS...")
-        subprocess.run(["cryptsetup", "luksFormat", partdev, "-q"], input=passphrase, check=True)
+        print(f"    Encrypting partition {partnum} with LUKS (version {luks_version})")
+
+        if luks_version == "1":
+            subprocess.run(
+                ["cryptsetup", "luksFormat", partdev, "-q", "--type", "luks1"],
+                input=passphrase, check=True
+            )
+        else:
+            subprocess.run(
+                ["cryptsetup", "luksFormat", partdev, "-q", "--type", "luks2"],
+                input=passphrase, check=True
+            )
+
         subprocess.run(["cryptsetup", "open", partdev, luks_name], input=passphrase, check=True)
         wait_for_device(mapped_path)
 
@@ -59,7 +74,7 @@ def assign_and_format(part, disk, loopdev):
 
         print(f"    Encrypting full disk with VeraCrypt on {loopdev}")
 
-            # Ensure device is free
+        # Ensure device is free
         subprocess.run(["losetup", "-d", loopdev], check=False)
         subprocess.run(["losetup", "--find", "--show", disk["_path"]], check=True)  # re-attach cleanly
         loopdev = subprocess.check_output(["losetup", "--find", "--show", disk["_path"]]).decode().strip()

@@ -13,7 +13,7 @@ It uses a JSON manifest to define disk layouts, filesystems, population rules (a
 - ✅ Multiple filesystem formats: `FAT32`, `NTFS`, `EXT2/3/4`, `XFS`, `EXFAT`
 - ✅ Populate files into partitions
 - ✅ Delete files or directories (with wildcard support)
-- ✅ Move files after population
+- ✅ Copy / move files after population
 - ✅ Build multiple disk images from a single manifest
 - ✅ Dockerized and reproducible
 
@@ -131,7 +131,8 @@ Each partition may include:
 
 - `filesystem`: One of `fat32`, `ntfs`, `ext2`, `ext3`, `ext4`, `xfs`, `exfat`
 - `populate`:
-  - `add_files`: Copy files from host into image
+  - `add_files`: Initially populates files from host into image
+  - `copy_files`: Copies populated file to new locations within the image
   - `move_files`: Move populated files to new locations within the image
   - `delete_files`: Remove files or directories, with `*` wildcard support
 
@@ -264,6 +265,14 @@ username@hostname:/$ xxd -l 512 -g 1 examples/mbr_examples/training_mbr.img
 000001e0: 07 19 83 5e 38 26 00 48 06 00 00 20 03 00 00 5e  ...^8&.H... ...^
 000001f0: 39 26 07 1e 2b 33 00 68 09 00 00 20 03 00 55 aa  9&..+3.h... ..U.
 ```
+
+---
+
+## To Do List 
+
+- Add bitlocker, LUKS, and Veracrypt full disk and partition level support 
+- Add volume bootloader code 
+- Add basic operating system structures
 
 ---
 
