@@ -47,6 +47,11 @@ class DiskImage:
         ).decode().strip()
         self.disk["_loopdev"] = self.loopdev
 
+        # RAW disk — no partition table, format directly
+        if self.disk.get("type") == "RAW":
+            self._setup_raw_disk()
+            return
+
         # Check for VeraCrypt full-disk encryption (defined at disk level)
         disk_encrypt = self.disk.get("encrypt", {})
         if disk_encrypt.get("type") == "veracrypt":
@@ -154,6 +159,33 @@ class DiskImage:
         part["_veracrypt_mount_path"] = mount_path
         part["_veracrypt_disk_path"] = disk_path
         part["_already_mounted"] = True
+
+    def _setup_raw_disk(self):
+        """Format the entire device as a single filesystem (no partition table)."""
+        loopdev = self.disk["_loopdev"]
+        fs = self.disk.get("filesystem", "fat32").lower()
+        label = self.disk.get("label", self.disk["name"])
+
+        print(f"[*] Formatting raw disk as {fs}")
+
+        if fs == "fat32":
+            subprocess.run(["mkfs.vfat", "-F32", "-n", label, loopdev], check=True)
+        elif fs == "ntfs":
+            subprocess.run(["mkfs.ntfs", "-f", "-L", label, loopdev], check=True)
+        elif fs in ("ext2", "ext3", "ext4"):
+            subprocess.run([f"mkfs.{fs}", "-L", label, loopdev], check=True)
+        elif fs == "xfs":
+            subprocess.run(["mkfs.xfs", "-L", label, loopdev], check=True)
+        elif fs == "exfat":
+            subprocess.run(["mkfs.exfat", "-n", label, loopdev], check=True)
+        elif fs in ("hfsplus", "hfs+"):
+            subprocess.run(["mkfs.hfsplus", "-v", label, loopdev], check=True)
+        else:
+            fail(f"Unsupported filesystem for RAW disk: {fs}")
+
+        # Set _dev on the disk object so the populator can treat it like a partition
+        self.disk["_dev"] = loopdev
+        self.disk["number"] = 0
 
     def populate(self):
         populate_disk(self.disk)

@@ -14,6 +14,13 @@ RUN apt-get update && apt-get install -y \
     sudo libpcsclite1 pcscd \
     && rm -rf /var/lib/apt/lists/*
 
+# Install hfsprogs from Buster repo (removed from Bullseye+)
+RUN echo "deb http://archive.debian.org/debian buster main" > /etc/apt/sources.list.d/buster.list && \
+    apt-get update -o Acquire::Check-Valid-Until=false && \
+    apt-get install -y -t buster hfsprogs && \
+    rm /etc/apt/sources.list.d/buster.list && \
+    rm -rf /var/lib/apt/lists/*
+
 # Download and install VeraCrypt CLI only (no GUI)
 RUN if [ "$TARGETARCH" = "amd64" ]; then \
       echo "Installing VeraCrypt AMD64" && \
@@ -30,8 +37,9 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
 # Create work directory
 WORKDIR /app
 
-# Copy your Python framework
+# Copy your Python framework and templates
 COPY diskforge/ diskforge/
+COPY templates/ templates/
 COPY main.py .
 
 # Default volume mount locations for files and output

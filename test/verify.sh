@@ -325,6 +325,134 @@ fi
 # ============================================================
 echo ""
 echo "=========================================="
+echo " VERIFYING: example_raw (RAW superfloppy)"
+echo "=========================================="
+
+IMG="/output/example_raw/training_raw.img"
+if [ ! -f "$IMG" ]; then
+    fail "Image not found: $IMG"
+else
+    LOOP=$(losetup --find --show "$IMG")
+
+    # RAW disks should NOT have a partition table
+    echo ""
+    echo "  --- No partition table (raw) ---"
+    if mmls "$IMG" > /dev/null 2>&1; then
+        fail "Partition table found on RAW disk (should have none)"
+    else
+        pass "No partition table detected (correct for RAW)"
+    fi
+
+    # Should have a filesystem directly on the device
+    echo ""
+    echo "  --- Direct filesystem ---"
+    MNT=$(mktemp -d)
+    if mount "$LOOP" "$MNT" 2>/dev/null; then
+        pass "Mounted raw filesystem directly"
+        verify_files "$MNT"
+        cleanup_mount "$MNT"
+    else
+        fail "Could not mount raw filesystem"
+        rmdir "$MNT" 2>/dev/null || true
+    fi
+
+    losetup -d "$LOOP"
+fi
+
+# ============================================================
+echo ""
+echo "=========================================="
+echo " VERIFYING: example_template (OS template)"
+echo "=========================================="
+
+IMG="/output/example_template/training_template.img"
+if [ ! -f "$IMG" ]; then
+    fail "Image not found: $IMG"
+else
+    LOOP=$(losetup --find --show "$IMG")
+    kpartx -a "$LOOP"
+    LOOPBASE=$(basename "$LOOP")
+
+    echo ""
+    echo "  --- Partition 1: NTFS with Windows 10 template ---"
+    MNT=$(mktemp -d)
+    if mount "/dev/mapper/${LOOPBASE}p1" "$MNT" 2>/dev/null; then
+        pass "Mounted NTFS partition"
+
+        # Verify Windows 10 template directories
+        for dir in "Windows/System32" "Windows/System32/config" "Windows/System32/winevt/Logs" \
+                   "Windows/Prefetch" "Program Files" "Users/Default/Documents" \
+                   "\$Recycle.Bin"; do
+            if [ -d "$MNT/$dir" ]; then
+                pass "Template dir: $dir"
+            else
+                fail "Missing template dir: $dir"
+            fi
+        done
+
+        # Verify stub files
+        for f in "Windows/System32/config/SAM" "Windows/System32/config/SYSTEM" \
+                 "Users/Default/NTUSER.DAT" "Windows/bootmgr"; do
+            if [ -f "$MNT/$f" ]; then
+                pass "Template file: $f"
+            else
+                fail "Missing template file: $f"
+            fi
+        done
+
+        # Verify scenario files were added into template structure
+        if [ -f "$MNT/Users/Default/Documents/doc1.docx" ]; then
+            pass "Scenario file placed in template dir"
+        else
+            fail "Scenario file missing from template dir"
+        fi
+
+        # Verify deleted file is gone
+        if [ ! -f "$MNT/Users/Default/Documents/text1.txt" ]; then
+            pass "text1.txt was deleted (not present)"
+        else
+            fail "text1.txt should have been deleted"
+        fi
+
+        cleanup_mount "$MNT"
+    else
+        fail "Could not mount NTFS partition"
+        rmdir "$MNT" 2>/dev/null || true
+    fi
+
+    kpartx -d "$LOOP"
+    losetup -d "$LOOP"
+fi
+
+# ============================================================
+echo ""
+echo "=========================================="
+echo " VERIFYING: example_mbr (boot code)"
+echo "=========================================="
+
+IMG="/output/example_mbr/training_mbr.img"
+if [ -f "$IMG" ]; then
+    echo ""
+    echo "  --- MBR boot code ---"
+    # Check for the boot message string in the first 446 bytes
+    if dd if="$IMG" bs=446 count=1 2>/dev/null | grep -q "Non-system"; then
+        pass "Boot code message found in MBR"
+    else
+        fail "Boot code message not found in MBR"
+    fi
+
+    # Check for 55 AA boot signature at bytes 510-511
+    SIG=$(dd if="$IMG" bs=1 skip=510 count=2 2>/dev/null | od -A n -t x1 | tr -d ' ')
+    if [ "$SIG" = "55aa" ]; then
+        pass "MBR boot signature 55AA present"
+    else
+        fail "MBR boot signature missing (got: $SIG)"
+    fi
+fi
+
+# ============================================================
+echo ""
+echo "=========================================="
 echo " RESULTS"
 echo "=========================================="
 echo "  Total:  $TESTS"

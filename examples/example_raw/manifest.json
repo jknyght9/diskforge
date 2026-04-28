@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "disks": [
+    {
+      "name": "training_raw",
+      "label": "RAWDISK",
+      "type": "RAW",
+      "size": "64M",
+      "filesystem": "fat32",
+      "populate": {
+        "add_files": [{ "source": "/files/*", "target": "/" }],
+        "delete_files": ["/text1.txt"]
+      }
+    }
+  ]
+}

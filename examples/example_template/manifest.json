@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "disks": [
+    {
+      "name": "training_template",
+      "label": "TemplateExample",
+      "type": "GPT",
+      "size": "256M",
+      "bootable": true,
+      "partitions": [
+        {
+          "number": 1,
+          "type": "primary",
+          "filesystem": "ntfs",
+          "label": "SYSTEM",
+          "size": "250M",
+          "populate": {
+            "template": "windows10",
+            "add_files": [{ "source": "/files/*", "target": "/Users/Default/Documents" }],
+            "delete_files": ["/Users/Default/Documents/text1.txt"]
+          }
+        }
+      ]
+    }
+  ]
+}

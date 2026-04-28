@@ -7,6 +7,8 @@ def partition_and_format_disk(disk):
 
     if disk['type'] == "MBR":
         partition_mbr(disk, loopdev)
+        if disk.get("bootable"):
+            write_boot_code(disk, loopdev)
     elif disk['type'] == "GPT":
         partition_gpt(disk, loopdev)
 
@@ -76,6 +78,8 @@ def assign_and_format(part, disk, loopdev):
         subprocess.run(["mkfs.xfs", "-L", label, dev_to_format], check=True)
     elif fs == "exfat":
         subprocess.run(["mkfs.exfat", "-n", label, dev_to_format], check=True)
+    elif fs in ("hfsplus", "hfs+"):
+        subprocess.run(["mkfs.hfsplus", "-v", label, dev_to_format], check=True)
     else:
         fail(f"Unsupported filesystem: {fs}")
 
@@ -146,8 +150,134 @@ def get_mbr_type_code(fs):
         "ext3": "83",
         "ext4": "83",
         "xfs": "83",
-        "exfat": "7"
+        "exfat": "7",
+        "hfsplus": "af",
+        "hfs+": "af"
     }.get(fs.lower(), "83")
+
+def write_boot_code(disk, loopdev):
+    """Write boot code to the first 446 bytes of an MBR disk."""
+    boot_code_path = disk.get("boot_code")
+    if boot_code_path:
+        if not os.path.exists(boot_code_path):
+            fail(f"Boot code file not found: {boot_code_path}")
+        with open(boot_code_path, "rb") as f:
+            code = f.read(446)
+        print(f"    Writing custom boot code from {boot_code_path}")
+    else:
+        code = _default_mbr_boot_code()
+        print(f"    Writing default MBR boot code")
+
+    # Pad to exactly 446 bytes, write to device (preserves partition table at 446-511)
+    code = code[:446].ljust(446, b'\x00')
+    with open(loopdev, "r+b") as dev:
+        dev.write(code)
+
+def _default_mbr_boot_code():
+    """Generate a minimal x86 real-mode MBR boot stub.
+
+    This 16-bit code runs at 0x7C00 in real mode:
+      - Prints "Non-system disk or disk error"
+      - Prints "Press any key to restart..."
+      - Waits for a keypress
+      - Reboots via INT 19h
+    """
+    # x86 real-mode assembly (NASM syntax for reference):
+    #   ORG 0x7C00
+    #   xor ax, ax
+    #   mov ds, ax
+    #   mov si, msg1
+    #   call print
+    #   mov si, msg2
+    #   call print
+    #   xor ah, ah       ; INT 16h AH=0: wait for key
+    #   int 0x16
+    #   int 0x19         ; reboot
+    # print:
+    #   lodsb
+    #   or al, al
+    #   jz .done
+    #   mov ah, 0x0E
+    #   int 0x10
+    #   jmp print
+    # .done:
+    #   ret
+    # msg1: db "Non-system disk or disk error", 0x0D, 0x0A, 0
+    # msg2: db "Press any key to restart...", 0x0D, 0x0A, 0
+    msg1 = b"Non-system disk or disk error\r\n\x00"
+    msg2 = b"Press any key to restart...\r\n\x00"
+
+    # Hand-assembled x86 machine code
+    code = bytearray()
+    # xor ax, ax
+    code += b'\x31\xc0'
+    # mov ds, ax
+    code += b'\x8e\xd8'
+    # mov si, offset msg1 (will patch after)
+    code += b'\xbe'
+    msg1_offset_pos = len(code)
+    code += b'\x00\x00'  # placeholder
+    # call print
+    code += b'\xe8'
+    print_call1_pos = len(code)
+    code += b'\x00\x00'  # placeholder
+    # mov si, offset msg2 (will patch after)
+    code += b'\xbe'
+    msg2_offset_pos = len(code)
+    code += b'\x00\x00'  # placeholder
+    # call print
+    code += b'\xe8'
+    print_call2_pos = len(code)
+    code += b'\x00\x00'  # placeholder
+    # xor ah, ah
+    code += b'\x30\xe4'
+    # int 0x16 (wait for keypress)
+    code += b'\xcd\x16'
+    # int 0x19 (reboot)
+    code += b'\xcd\x19'
+
+    # print subroutine
+    print_offset = len(code)
+    # lodsb
+    code += b'\xac'
+    # or al, al
+    code += b'\x08\xc0'
+    # jz .done (2 bytes forward: jz +5)
+    code += b'\x74\x04'
+    # mov ah, 0x0E
+    code += b'\xb4\x0e'
+    # int 0x10
+    code += b'\xcd\x10'
+    # jmp print (-8 from here)
+    code += b'\xeb\xf6'
+    # ret
+    code += b'\xc3'
+
+    # Messages
+    msg1_abs = 0x7C00 + len(code)
+    code += msg1
+    msg2_abs = 0x7C00 + len(code)
+    code += msg2
+
+    # Patch offsets (all relative to 0x7C00)
+    code[msg1_offset_pos] = msg1_abs & 0xFF
+    code[msg1_offset_pos + 1] = (msg1_abs >> 8) & 0xFF
+
+    code[msg2_offset_pos] = msg2_abs & 0xFF
+    code[msg2_offset_pos + 1] = (msg2_abs >> 8) & 0xFF
+
+    # Patch call offsets (relative: target - (call_addr + 2))
+    call1_addr = 0x7C00 + print_call1_pos
+    rel1 = (0x7C00 + print_offset) - (call1_addr + 2)
+    code[print_call1_pos] = rel1 & 0xFF
+    code[print_call1_pos + 1] = (rel1 >> 8) & 0xFF
+
+    call2_addr = 0x7C00 + print_call2_pos
+    rel2 = (0x7C00 + print_offset) - (call2_addr + 2)
+    code[print_call2_pos] = rel2 & 0xFF
+    code[print_call2_pos + 1] = (rel2 >> 8) & 0xFF
+
+    return bytes(code)
 
 def partition_gpt(disk, loopdev):
     print("    Creating GPT partition table...")

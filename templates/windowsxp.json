@@ -1,0 +1,41 @@
+{
+  "name": "windowsxp",
+  "description": "Windows XP/2003 NTFS directory structure",
+  "recommended_filesystem": "ntfs",
+  "directories": [
+    "WINDOWS/system32",
+    "WINDOWS/system32/config",
+    "WINDOWS/system32/drivers/etc",
+    "WINDOWS/Prefetch",
+    "WINDOWS/Temp",
+    "WINDOWS/INF",
+    "WINDOWS/Help",
+    "Program Files",
+    "Program Files/Common Files",
+    "Documents and Settings/Default User/My Documents",
+    "Documents and Settings/Default User/Desktop",
+    "Documents and Settings/Default User/Favorites",
+    "Documents and Settings/Default User/Start Menu/Programs/Startup",
+    "Documents and Settings/All Users/Documents",
+    "Documents and Settings/All Users/Desktop",
+    "Documents and Settings/All Users/Start Menu/Programs/Startup",
+    "Recycled",
+    "System Volume Information"
+  ],
+  "files": {
+    "WINDOWS/system32/config/SAM": { "type": "empty" },
+    "WINDOWS/system32/config/SYSTEM": { "type": "empty" },
+    "WINDOWS/system32/config/SOFTWARE": { "type": "empty" },
+    "WINDOWS/system32/config/SECURITY": { "type": "empty" },
+    "WINDOWS/system32/config/DEFAULT": { "type": "empty" },
+    "WINDOWS/system32/drivers/etc/hosts": { "type": "empty" },
+    "Documents and Settings/Default User/NTUSER.DAT": { "type": "empty" },
+    "WINDOWS/system32/cmd.exe": { "type": "empty" },
+    "WINDOWS/system32/notepad.exe": { "type": "empty" },
+    "WINDOWS/explorer.exe": { "type": "empty" },
+    "ntldr": { "type": "empty" },
+    "NTDETECT.COM": { "type": "empty" },
+    "boot.ini": { "type": "empty" },
+    "pagefile.sys": { "type": "zero_fill", "size": 4096 }
+  }
+}

@@ -38,6 +38,15 @@ def populate_disk(disk):
 
             populate = part.get("populate", {})
 
+            # Apply OS template (directories + stub files) before adding scenario files
+            template_name = populate.get("template")
+            if template_name:
+                from .templates import load_template, apply_template
+                template = load_template(template_name)
+                print(f"[~] Applying template '{template_name}' to {partlabel}", file=sys.stdout, flush=True)
+                apply_template(template, mount_point)
+                subprocess.run(["sync"], check=True)
+
             # Add files
             print(f"[~] Adding files to {partlabel}", file=sys.stdout, flush=True)
             for file_entry in populate.get("add_files", []):
@@ -89,14 +98,15 @@ def populate_disk(disk):
                     elif path_obj.is_file():
                         path_obj.unlink()
 
-            # Remove empty folders
-            for root, dirs, files in os.walk(mount_point, topdown=False):
-                for d in dirs:
-                    dir_path = Path(root) / d
-                    try:
-                        dir_path.rmdir()
-                    except OSError:
-                        pass
+            # Remove empty folders (skip if a template was applied — empty dirs are intentional)
+            if not template_name:
+                for root, dirs, files in os.walk(mount_point, topdown=False):
+                    for d in dirs:
+                        dir_path = Path(root) / d
+                        try:
+                            dir_path.rmdir()
+                        except OSError:
+                            pass
 
             subprocess.run(["sync"], check=True)
 
@@ -112,6 +122,11 @@ def populate_disk(disk):
             # Close LUKS mapping after unmount
             if part.get("_luks_open") and part.get("_luks_name"):
                 subprocess.run(["cryptsetup", "close", part["_luks_name"]], check=False)
+
+    # RAW disks have no partitions — the disk object itself is the "partition"
+    if disk.get("type") == "RAW":
+        process_partition(disk)
+        return
 
     for part in disk["partitions"]:
         if part["type"] == "extended":
