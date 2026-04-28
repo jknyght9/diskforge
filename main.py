@@ -1,4 +1,4 @@
-from diskbuilder.builder import DiskBuilder
+from diskforge.builder import DiskForge
 import sys
 
 if __name__ == "__main__":
@@ -6,5 +6,5 @@ if __name__ == "__main__":
         print("Usage: python main.py <manifest.json>")
         sys.exit(1)
 
-    builder = DiskBuilder(sys.argv[1])
-    builder.run()
+    forge = DiskForge(sys.argv[1])
+    forge.run()

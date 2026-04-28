@@ -1,0 +1,77 @@
+site_name: DiskForge
+site_url: https://jknyght9.github.io/diskforge
+site_author: Jacob Stauffer | CISSP, GCFA, GREM, OSCP
+site_description: A forensics training tool for building disk images from JSON manifests
+
+repo_name: jknyght9/diskforge
+repo_url: https://github.com/jknyght9/diskforge
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.expand
+    - content.code.copy
+    - content.tabs.link
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_mermaid
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Prerequisites: getting-started/prerequisites.md
+    - Quick Start: getting-started/quick-start.md
+  - Configuration:
+    - Manifest Reference: configuration/manifest-reference.md
+    - Encryption: configuration/encryption.md
+  - Examples:
+    - GPT Disk: examples/basic-gpt.md
+    - MBR Disk: examples/basic-mbr.md
+    - LUKS Encryption: examples/luks-encryption.md
+    - VeraCrypt Encryption: examples/veracrypt-encryption.md
+  - Analysis:
+    - Analyzing Images: analysis/analyzing-images.md
+  - Development:
+    - Testing: development/testing.md
+  - Reference:
+    - Supported Filesystems: reference/filesystems.md
+    - Troubleshooting: reference/troubleshooting.md

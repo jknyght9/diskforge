@@ -1,5 +1,16 @@
+# OS files
 .DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Build output
 output/
-scenarios/
-test/
 **/*.img
+**/*.img.bak
+**/*.img.zip
+
+# MkDocs build output
+site/

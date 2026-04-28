@@ -30,13 +30,12 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
 # Create work directory
 WORKDIR /app
 
-# Copy your Python builder framework
-COPY diskbuilder/ diskbuilder/
+# Copy your Python framework
+COPY diskforge/ diskforge/
 COPY main.py .
 
 # Default volume mount locations for files and output
-VOLUME ["/files", "/manifests" "/output"]
+VOLUME ["/files", "/manifests", "/output"]
 
 # Entrypoint example (can be overridden)
 ENTRYPOINT ["python3", "main.py"]
-#CMD ["python3", "disk_builder.py"]

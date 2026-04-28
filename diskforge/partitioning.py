@@ -1,9 +1,8 @@
 import os, subprocess, sys
-from diskbuilder.utils import fail,wait_for_device
+from diskforge.utils import fail, wait_for_device
 
 def partition_and_format_disk(disk):
     print(f"[*] Partitioning disk: {disk['name']}", file=sys.stdout, flush=True)
-    disk_path = disk["_path"]
     loopdev = disk["_loopdev"]
 
     if disk['type'] == "MBR":
@@ -47,70 +46,19 @@ def assign_and_format(part, disk, loopdev):
 
         print(f"    Encrypting partition {partnum} with LUKS (version {luks_version})")
 
-        if luks_version == "1":
-            subprocess.run(
-                ["cryptsetup", "luksFormat", partdev, "-q", "--type", "luks1"],
-                input=passphrase, check=True
-            )
-        else:
-            subprocess.run(
-                ["cryptsetup", "luksFormat", partdev, "-q", "--type", "luks2"],
-                input=passphrase, check=True
-            )
+        subprocess.run(
+            ["cryptsetup", "luksFormat", partdev, "-q", "--type", f"luks{luks_version}"],
+            input=passphrase, check=True
+        )
 
         subprocess.run(["cryptsetup", "open", partdev, luks_name], input=passphrase, check=True)
         wait_for_device(mapped_path)
 
         part["_dev"] = mapped_path
-        part["_luks_name"] = luks_name  # Store name for later closure
+        part["_luks_name"] = luks_name
         part["_luks_open"] = True
 
-    # VERACRYPT encryption
-    elif encrypt_cfg.get("type") == "veracrypt":
-        passphrase = encrypt_cfg.get("passphrase", "")
-        loopdev = disk["_loopdev"]
-        mount_path = f"/mnt/veracrypt_{disk['name']}"
-        os.makedirs(mount_path, exist_ok=True)
-
-        print(f"    Encrypting full disk with VeraCrypt on {loopdev}")
-
-        # Ensure device is free
-        subprocess.run(["losetup", "-d", loopdev], check=False)
-        subprocess.run(["losetup", "--find", "--show", disk["_path"]], check=True)  # re-attach cleanly
-        loopdev = subprocess.check_output(["losetup", "--find", "--show", disk["_path"]]).decode().strip()
-        disk["_loopdev"] = loopdev
-
-        # Create encrypted volume
-        subprocess.run([
-            "veracrypt", "--text", "--create", loopdev,
-            "--volume-type", "normal",
-            "--encryption", "AES", 
-            "--hash", "SHA-512",
-            "--filesystem", fs,
-            "--password", passphrase,
-            "--pim", "0", 
-            "--keyfiles", "",
-            "--non-interactive",
-            "--quick"
-        ], check=True)
-
-        # Mount VeraCrypt volume to container path
-        subprocess.run([
-            "veracrypt", "--text", "--mount", loopdev, mount_path,
-            "--password", passphrase, 
-            "--pim", "0", 
-            "--keyfiles", "",
-            "--non-interactive",
-            "--mount-options=system"
-        ], check=True)
-        wait_for_device(mount_path)
-
-        part["_dev"] = mount_path
-        part["_veracrypt_mounted"] = True
-        part["_veracrypt_mount_path"] = mount_path
-        return
-
-    # Final device to format
+    # Format the filesystem on the (possibly LUKS-mapped) device
     dev_to_format = part["_dev"]
 
     print(f"    Formatting partition {partnum} as {fs}")
@@ -129,7 +77,7 @@ def assign_and_format(part, disk, loopdev):
     elif fs == "exfat":
         subprocess.run(["mkfs.exfat", "-n", label, dev_to_format], check=True)
     else:
-        self.fail(f"Unsupported filesystem: {fs}")
+        fail(f"Unsupported filesystem: {fs}")
 
 def partition_mbr(disk, loopdev):
     print("    Creating MBR partition table with sfdisk...")
@@ -204,7 +152,14 @@ def get_mbr_type_code(fs):
 def partition_gpt(disk, loopdev):
     print("    Creating GPT partition table...")
     subprocess.run(["parted", "-s", loopdev, "mklabel", "gpt"], check=True)
+
+    start_mib = 1  # Leave 1MiB for GPT header
+
     for part in disk["partitions"]:
-        start = f"{1 + 100 * (part['number'] - 1)}MiB"
-        end = f"{100 * part['number']}MiB"
-        subprocess.run(["parted", "-s", loopdev, "mkpart", "primary", start, end], check=True)
+        size_mib = int(part["size"].replace("M", ""))
+        end_mib = start_mib + size_mib
+        subprocess.run([
+            "parted", "-s", loopdev, "mkpart", "primary",
+            f"{start_mib}MiB", f"{end_mib}MiB"
+        ], check=True)
+        start_mib = end_mib

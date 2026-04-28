@@ -1,9 +1,10 @@
 import glob, os, shutil, subprocess, sys
 from pathlib import Path
+from .utils import fail
 
 def populate_disk(disk):
     print(f"[*] Populating disk: {disk['name']}")
-    mount_base = Path("/mnt/diskbuilder")
+    mount_base = Path("/mnt/diskforge")
     os.makedirs(mount_base, exist_ok=True)
 
     def process_partition(part):
@@ -13,31 +14,39 @@ def populate_disk(disk):
         if fs in ("", "none", "null"):
             return
         partnum = part["number"]
-        partlabel = part["label"]
-        mount_point = mount_base / f"{disk['name']}_part{partnum}"
-        os.makedirs(mount_point, exist_ok=True)
+        partlabel = part.get("label", f"part{partnum}")
+
+        # For VeraCrypt full-disk, the volume is already mounted at _dev
+        already_mounted = part.get("_already_mounted", False)
+
+        if already_mounted:
+            mount_point = Path(part["_dev"])
+        else:
+            mount_point = mount_base / f"{disk['name']}_part{partnum}"
+            os.makedirs(mount_point, exist_ok=True)
 
         try:
-            if fs == "exfat":
-                try:
-                    subprocess.run(["mount.exfat-fuse", part["_dev"], str(mount_point)], check=True)
-                except:
-                    print(f"❌ Failed to mount {part['_dev']} as exfat using fuse.exfat.")
-                    return
-            else:
-                subprocess.run(["mount", part["_dev"], str(mount_point)], check=True)
-            
+            if not already_mounted:
+                if fs == "exfat":
+                    try:
+                        subprocess.run(["mount.exfat-fuse", part["_dev"], str(mount_point)], check=True)
+                    except subprocess.CalledProcessError:
+                        print(f"[!] Failed to mount {part['_dev']} as exfat using fuse.exfat.")
+                        return
+                else:
+                    subprocess.run(["mount", part["_dev"], str(mount_point)], check=True)
+
             populate = part.get("populate", {})
 
             # Add files
             print(f"[~] Adding files to {partlabel}", file=sys.stdout, flush=True)
             for file_entry in populate.get("add_files", []):
                 target_path = mount_point / file_entry["target"].lstrip("/")
-                target_path.parent.mkdir(parents=True, exist_ok=True)
+                target_path.mkdir(parents=True, exist_ok=True)
 
                 sources = glob.glob(file_entry["source"])
                 if not sources:
-                    self.fail(f"No files matched pattern: {file_entry['source']}")
+                    fail(f"No files matched pattern: {file_entry['source']}")
 
                 for src in sources:
                     if os.path.isdir(src):
@@ -45,7 +54,6 @@ def populate_disk(disk):
                     else:
                         subprocess.run(["cp", "-av", src, str(target_path)], check=True)
 
-            # Flush all file data to disk
             subprocess.run(["sync"], check=True)
 
             # Copy files
@@ -57,7 +65,6 @@ def populate_disk(disk):
                 if src_path.exists():
                     shutil.copy(str(src_path), str(dst_path))
 
-            # Flush all file and data to disk
             subprocess.run(["sync"], check=True)
 
             # Move files
@@ -69,7 +76,6 @@ def populate_disk(disk):
                 if src_path.exists():
                     shutil.move(str(src_path), str(dst_path))
 
-            # Flush all file data to disk
             subprocess.run(["sync"], check=True)
 
             # Delete files
@@ -92,16 +98,20 @@ def populate_disk(disk):
                     except OSError:
                         pass
 
-            # Flush all file data to disk
             subprocess.run(["sync"], check=True)
 
         finally:
-            subprocess.run(["umount", str(mount_point)], check=True)
-            os.rmdir(mount_point)
-            if (part.get("_luks_open") and part.get("_luks_name")):
-                subprocess.run(["cryptsetup", "close", part["_luks_name"]], check=True)
-            if part.get("_veracrypt_mounted") and part.get("_veracrypt_mount_path"):
-                subprocess.run(["veracrypt", "--text", "--dismount", part["_veracrypt_mount_path"]], check=True)
+            if not already_mounted:
+                # Only unmount if we mounted it ourselves
+                subprocess.run(["umount", str(mount_point)], check=False)
+                try:
+                    os.rmdir(mount_point)
+                except OSError:
+                    pass
+
+            # Close LUKS mapping after unmount
+            if part.get("_luks_open") and part.get("_luks_name"):
+                subprocess.run(["cryptsetup", "close", part["_luks_name"]], check=False)
 
     for part in disk["partitions"]:
         if part["type"] == "extended":
