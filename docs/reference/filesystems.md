@@ -15,6 +15,7 @@ DiskForge supports the following filesystems for partition formatting.
 | **ext4** | `0x83` | Yes | Yes | `mkfs.ext4` |
 | **XFS** | `0x83` | Yes | Yes | `mkfs.xfs` |
 | **exFAT** | `0x07` | No | No | `mkfs.exfat` |
+| **HFS+** | `0xAF` | No | No | `mkfs.hfsplus` |
 
 ---
 
@@ -53,6 +54,17 @@ DiskForge supports the following filesystems for partition formatting.
 - Extended FAT format, no 4GB file limit
 - No journaling, no permissions
 - Mounted via `mount.exfat-fuse` in the container
+
+### HFS+
+
+- macOS native filesystem (pre-APFS)
+- Supports resource forks, file permissions, journaling
+- Forensically relevant: `.fseventsd`, `.Spotlight-V100`, `.Trashes`
+- Formatted via `mkfs.hfsplus` (from `hfsprogs` package)
+- Use with the `macos` OS template for realistic macOS forensic scenarios
+
+!!! note "APFS Not Supported"
+    APFS (Apple File System) has no Linux implementation and cannot be created by DiskForge. Use HFS+ for macOS forensic training scenarios.
 
 !!! warning "exFAT Limitations"
     exFAT is mounted using FUSE (`exfat-fuse`) inside the container, which can be slower than kernel-native mounts. It does not support LUKS or VeraCrypt encryption within DiskForge.

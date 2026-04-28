@@ -63,11 +63,14 @@ nav:
   - Configuration:
     - Manifest Reference: configuration/manifest-reference.md
     - Encryption: configuration/encryption.md
+    - OS Templates: configuration/templates.md
   - Examples:
     - GPT Disk: examples/basic-gpt.md
     - MBR Disk: examples/basic-mbr.md
+    - RAW Disk: examples/raw-disk.md
     - LUKS Encryption: examples/luks-encryption.md
     - VeraCrypt Encryption: examples/veracrypt-encryption.md
+    - OS Template: examples/os-template.md
   - Analysis:
     - Analyzing Images: analysis/analyzing-images.md
   - Development:

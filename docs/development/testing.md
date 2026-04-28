@@ -18,12 +18,14 @@ This runs both phases automatically.
 
 Builds all four example scenarios inside Docker:
 
-| Scenario | Partition Table | Encryption | Filesystems |
-|----------|----------------|------------|-------------|
-| `example_gpt` | GPT | None | FAT32, NTFS, exFAT, ext3 |
-| `example_mbr` | MBR | None | FAT32, NTFS, exFAT, ext3 (logical) |
-| `example_luks` | GPT | LUKS v1 | ext4 |
-| `example_veracrypt` | GPT | VeraCrypt | ext4 |
+| Scenario | Partition Table | Encryption | Filesystems | Special |
+|----------|----------------|------------|-------------|---------|
+| `example_gpt` | GPT | None | FAT32, NTFS, exFAT, ext3 | |
+| `example_mbr` | MBR | None | FAT32, NTFS, exFAT, ext3 (logical) | Boot code |
+| `example_luks` | GPT | LUKS v1 | ext4 | |
+| `example_veracrypt` | GPT | VeraCrypt | ext4 | |
+| `example_raw` | RAW (none) | None | FAT32 | Superfloppy |
+| `example_template` | GPT | None | NTFS | Windows 10 template |
 
 Each scenario runs a full `docker run` with the example's manifest and source files.
 
@@ -55,14 +57,32 @@ A second container mounts all four built images and runs automated checks:
 - Wrong passphrase is rejected
 - Files are accessible after decryption
 
+**For RAW disks:**
+
+- No partition table detected by `mmls`
+- Filesystem mounts directly on the device
+- Expected files present, deleted files absent
+
+**For OS templates:**
+
+- Template directories exist (System32, Prefetch, Program Files, etc.)
+- Template stub files exist (SAM, SYSTEM, NTUSER.DAT, bootmgr)
+- Scenario files placed correctly into template structure
+- Deleted files are absent
+
+**For MBR boot code:**
+
+- Boot message string found in first 446 bytes
+- 55AA boot signature present at bytes 510-511
+
 ### Expected Output
 
 ```
 ==========================================
  RESULTS
 ==========================================
-  Total:  55
-  Passed: 55
+  Total:  78
+  Passed: 78
   Failed: 0
 ==========================================
 ```

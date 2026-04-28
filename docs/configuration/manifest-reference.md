@@ -37,12 +37,39 @@ The manifest is a JSON file that defines one or more disk images to build. Each 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `name` | string | Yes | Image filename (produces `{name}.img`) |
-| `type` | string | Yes | Partition table type: `"MBR"` or `"GPT"` |
-| `size` | string | Yes | Disk size (e.g. `"512M"`, `"32G"`) |
+| `type` | string | Yes | Partition table type: `"MBR"`, `"GPT"`, or `"RAW"` |
+| `size` | string | Yes | Disk size (e.g. `"512M"`, `"32G"`, `"1.44M"`) |
 | `label` | string | No | Disk label |
-| `bootable` | boolean | No | Mark disk as bootable |
+| `bootable` | boolean | No | Mark disk as bootable (writes MBR boot code for MBR disks) |
+| `boot_code` | string | No | Path to custom boot code binary (max 446 bytes, MBR only) |
 | `encrypt` | object | No | Disk-level encryption (VeraCrypt only) |
-| `partitions` | array | Yes | Array of partition definitions |
+| `filesystem` | string | RAW only | Filesystem type (required for RAW disks) |
+| `populate` | object | RAW only | File population rules (for RAW disks) |
+| `partitions` | array | MBR/GPT | Array of partition definitions |
+
+!!! info "Boot Code"
+    When `bootable: true` on an MBR disk, DiskForge writes a generic boot stub that prints "Non-system disk or disk error" to the first 446 bytes. You can override this with a custom binary via `boot_code`.
+
+---
+
+## RAW Disk (Superfloppy)
+
+A RAW disk has no partition table — the filesystem is written directly to the device. This is common for floppy images, simple USB drives, and some forensic scenarios.
+
+```json
+{
+  "name": "floppy",
+  "type": "RAW",
+  "size": "1.44M",
+  "filesystem": "fat32",
+  "label": "FLOPPY",
+  "populate": {
+    "add_files": [{ "source": "/files/*", "target": "/" }]
+  }
+}
+```
+
+RAW disks have no `partitions` array. The `filesystem`, `label`, and `populate` fields go directly on the disk object.
 
 ---
 
@@ -137,16 +164,30 @@ See the [Encryption Guide](encryption.md) for detailed configuration.
 
 ## Populate Object
 
-The `populate` block controls file operations on a partition. Operations execute in order: add → copy → move → delete.
+The `populate` block controls file operations on a partition. Operations execute in order: template → add → copy → move → delete.
 
 ```json
 "populate": {
+  "template": "windows10",
   "add_files": [ ... ],
   "copy_files": [ ... ],
   "move_files": [ ... ],
   "delete_files": [ ... ]
 }
 ```
+
+### template
+
+Apply an OS directory structure template before adding files. Templates create directories and stub files that mimic a real operating system layout. See [OS Templates](templates.md) for details.
+
+```json
+"template": "windows10"
+```
+
+Available templates: `windows10`, `windowsxp`, `linux`, `macos`
+
+!!! tip
+    Templates are applied first, so `add_files` can target template directories. For example, place EVTX logs into `/Windows/System32/winevt/Logs` after applying the `windows10` template.
 
 ### add_files
 
