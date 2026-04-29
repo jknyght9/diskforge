@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "disks": [
+    {
+      "name": "training_btrfs",
+      "label": "BtrfsExample",
+      "type": "GPT",
+      "size": "256M",
+      "partitions": [
+        {
+          "number": 1,
+          "type": "primary",
+          "filesystem": "btrfs",
+          "label": "BTRFS_DATA",
+          "size": "250M",
+          "populate": {
+            "template": "linux",
+            "add_files": [{ "source": "/files/*", "target": "/home" }],
+            "delete_files": ["/home/text1.txt"]
+          }
+        }
+      ]
+    }
+  ]
+}

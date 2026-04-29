@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "disks": [
+    {
+      "name": "training_f2fs",
+      "label": "F2FSExample",
+      "type": "GPT",
+      "size": "256M",
+      "partitions": [
+        {
+          "number": 1,
+          "type": "primary",
+          "filesystem": "f2fs",
+          "label": "F2FS_DATA",
+          "size": "250M",
+          "populate": {
+            "add_files": [{ "source": "/files/*", "target": "/" }],
+            "delete_files": ["/text1.txt"]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -427,6 +427,88 @@ fi
 # ============================================================
 echo ""
 echo "=========================================="
+echo " VERIFYING: example_btrfs (btrfs + Linux template)"
+echo "=========================================="
+
+IMG="/output/example_btrfs/training_btrfs.img"
+if [ ! -f "$IMG" ]; then
+    fail "Image not found: $IMG"
+else
+    LOOP=$(losetup --find --show "$IMG")
+    kpartx -a "$LOOP"
+    LOOPBASE=$(basename "$LOOP")
+
+    echo ""
+    echo "  --- Partition 1: btrfs ---"
+    MNT=$(mktemp -d)
+    if mount "/dev/mapper/${LOOPBASE}p1" "$MNT" 2>/dev/null; then
+        pass "Mounted btrfs partition"
+
+        # Verify Linux template directories
+        for dir in "etc" "var/log" "home" "usr/bin" "root"; do
+            if [ -d "$MNT/$dir" ]; then
+                pass "Template dir: $dir"
+            else
+                fail "Missing template dir: $dir"
+            fi
+        done
+
+        # Verify Linux template stub files
+        for f in "etc/passwd" "etc/shadow" "var/log/syslog"; do
+            if [ -f "$MNT/$f" ]; then
+                pass "Template file: $f"
+            else
+                fail "Missing template file: $f"
+            fi
+        done
+
+        # Verify scenario files in /home
+        check_file_on_mount "$MNT/home" "doc1.docx"
+        check_file_absent "$MNT/home" "text1.txt"
+
+        cleanup_mount "$MNT"
+    else
+        fail "Could not mount btrfs partition"
+        rmdir "$MNT" 2>/dev/null || true
+    fi
+
+    kpartx -d "$LOOP"
+    losetup -d "$LOOP"
+fi
+
+# ============================================================
+echo ""
+echo "=========================================="
+echo " VERIFYING: example_f2fs (F2FS filesystem)"
+echo "=========================================="
+
+IMG="/output/example_f2fs/training_f2fs.img"
+if [ ! -f "$IMG" ]; then
+    fail "Image not found: $IMG"
+else
+    LOOP=$(losetup --find --show "$IMG")
+    kpartx -a "$LOOP"
+    LOOPBASE=$(basename "$LOOP")
+
+    echo ""
+    echo "  --- Partition 1: F2FS ---"
+    MNT=$(mktemp -d)
+    if mount "/dev/mapper/${LOOPBASE}p1" "$MNT" 2>/dev/null; then
+        pass "Mounted F2FS partition"
+        verify_files "$MNT"
+        cleanup_mount "$MNT"
+    else
+        fail "Could not mount F2FS partition"
+        rmdir "$MNT" 2>/dev/null || true
+    fi
+
+    kpartx -d "$LOOP"
+    losetup -d "$LOOP"
+fi
+
+# ============================================================
+echo ""
+echo "=========================================="
 echo " VERIFYING: example_mbr (boot code)"
 echo "=========================================="
 
