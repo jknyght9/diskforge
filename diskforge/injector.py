@@ -1,5 +1,6 @@
 import os, sys
 from .utils import fail
+from .partitioning import parse_size_mib
 
 SECTOR_SIZE = 512
 SECTORS_PER_MIB = 2048
@@ -71,20 +72,14 @@ def _mbr_unallocated_start(disk):
     highest_end_sector = 2048  # Start after MBR + alignment
 
     for part in disk.get("partitions", []):
-        size_mib = int(part["size"].replace("M", "").replace("G", ""))
-        if "G" in part["size"]:
-            size_mib *= 1024
+        size_mib = parse_size_mib(part["size"])
         size_sectors = size_mib * SECTORS_PER_MIB
 
         if part["type"] == "extended":
-            # Extended partition includes its logical partitions
             ext_size = 0
             for logical in part.get("partitions", []):
-                l_size_mib = int(logical["size"].replace("M", "").replace("G", ""))
-                if "G" in logical["size"]:
-                    l_size_mib *= 1024
+                l_size_mib = parse_size_mib(logical["size"])
                 ext_size += l_size_mib * SECTORS_PER_MIB
-            # Extended has a 1MiB gap before first logical
             ext_size += SECTORS_PER_MIB
             highest_end_sector += ext_size
         else:
@@ -97,9 +92,7 @@ def _gpt_unallocated_start(disk):
     start_mib = 1  # GPT header takes 1MiB
 
     for part in disk.get("partitions", []):
-        size_mib = int(part["size"].replace("M", "").replace("G", ""))
-        if "G" in part["size"]:
-            size_mib *= 1024
+        size_mib = parse_size_mib(part["size"])
         start_mib += size_mib
 
     return start_mib * 1024 * 1024

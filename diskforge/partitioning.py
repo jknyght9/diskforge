@@ -87,19 +87,31 @@ def assign_and_format(part, disk, loopdev):
     else:
         fail(f"Unsupported filesystem: {fs}")
 
+def parse_size_mib(size_str):
+    """Parse a size string like '100M', '30G', '2T' into MiB."""
+    size_str = size_str.strip().upper()
+    if size_str.endswith("G"):
+        return int(size_str[:-1]) * 1024
+    elif size_str.endswith("T"):
+        return int(size_str[:-1]) * 1024 * 1024
+    elif size_str.endswith("M"):
+        return int(size_str[:-1])
+    else:
+        return int(size_str)
+
 def partition_mbr(disk, loopdev):
     print("    Creating MBR partition table with sfdisk...")
     SECTORS_PER_MIB = 2048
     sfdisk_lines = ["label: dos"]
     start_sector = 2048
-    total_sectors = int(disk['size'].replace('M', '')) * SECTORS_PER_MIB
+    total_sectors = parse_size_mib(disk['size']) * SECTORS_PER_MIB
     logical_parts = []
     extended_entry = None
 
     for part in disk["partitions"]:
         if part["type"] == "primary":
             part_type = get_mbr_type_code(part["filesystem"])
-            size_mib = int(part["size"].replace("M", ""))
+            size_mib = parse_size_mib(part["size"])
             size_sectors = size_mib * SECTORS_PER_MIB
             if start_sector + size_sectors > total_sectors:
                 fail(f"Partition {part['number']} (start {start_sector}, size {size_sectors}) exceeds disk bounds ({total_sectors} sectors)")
@@ -116,7 +128,7 @@ def partition_mbr(disk, loopdev):
 
             for logical in part.get("partitions", []):
                 logical_type = get_mbr_type_code(logical["filesystem"])
-                size_mib = int(logical["size"].replace("M", ""))
+                size_mib = parse_size_mib(logical["size"])
                 size_sectors = size_mib * SECTORS_PER_MIB
                 if logical_start + size_sectors > total_sectors:
                     fail(f"Logical partition {logical['number']} (start {logical_start}, size {size_sectors}) exceeds disk bounds ({total_sectors} sectors)")
@@ -292,7 +304,7 @@ def partition_gpt(disk, loopdev):
     start_mib = 1  # Leave 1MiB for GPT header
 
     for part in disk["partitions"]:
-        size_mib = int(part["size"].replace("M", ""))
+        size_mib = parse_size_mib(part["size"])
         end_mib = start_mib + size_mib
         subprocess.run([
             "parted", "-s", loopdev, "mkpart", "primary",
