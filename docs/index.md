@@ -101,6 +101,7 @@ graph LR
 | **Encryption** | LUKS v1/v2 (partition-level), VeraCrypt (full-disk) |
 | **Boot Code** | Automatic MBR boot stub with custom override support |
 | **OS Templates** | Windows 10, Windows XP, Linux, macOS directory structures |
+| **Data Injection** | Hide data in unallocated space (passwords, recovery keys, artifacts) |
 | **File Operations** | Add, copy, move, delete with glob/wildcard support |
 | **Multi-Disk** | Build multiple disk images from a single manifest |
 | **Testing** | Automated build + verification suite (78 checks) |

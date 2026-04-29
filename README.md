@@ -17,10 +17,11 @@ Define disk layouts, filesystems, encryption, OS templates, and file population 
 - VeraCrypt full-disk encryption
 - MBR boot code (generic stub or custom binary)
 - OS directory templates: Windows 10, Windows XP, Linux, macOS
+- Unallocated space injection (hide passwords, recovery keys, artifacts)
 - File population with add, copy, move, and delete operations
 - Wildcard and glob pattern support for file operations
 - Multi-disk builds from a single manifest
-- Automated test and verification suite (78 checks)
+- Automated test and verification suite (99 checks)
 - Dockerized and reproducible (amd64 + arm64)
 
 ---
@@ -159,6 +160,9 @@ Disks with no partition table — filesystem written directly to the device:
 | `examples/example_veracrypt/` | Full-disk VeraCrypt encryption |
 | `examples/example_raw/` | RAW superfloppy FAT32 image |
 | `examples/example_template/` | Windows 10 OS template with NTFS |
+| `examples/example_btrfs/` | btrfs with Linux template |
+| `examples/example_f2fs/` | F2FS filesystem |
+| `examples/example_inject/` | Hidden data in unallocated space |
 
 ---
 
@@ -168,7 +172,7 @@ Disks with no partition table — filesystem written directly to the device:
 bash test/test.sh
 ```
 
-Builds all 6 example images, then runs 78 verification checks: partition tables, file contents, encryption passphrase validation (correct + wrong), boot code, template directories, and stub files.
+Builds all 9 example images, then runs 99 verification checks: partition tables, file contents, encryption passphrase validation (correct + wrong), boot code, template directories, and stub files.
 
 ---
 

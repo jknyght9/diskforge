@@ -46,6 +46,7 @@ The manifest is a JSON file that defines one or more disk images to build. Each 
 | `filesystem` | string | RAW only | Filesystem type (required for RAW disks) |
 | `populate` | object | RAW only | File population rules (for RAW disks) |
 | `partitions` | array | MBR/GPT | Array of partition definitions |
+| `inject` | array | No | Data to inject into unallocated space (see [Injection](injection.md)) |
 
 !!! info "Boot Code"
     When `bootable: true` on an MBR disk, DiskForge writes a generic boot stub that prints "Non-system disk or disk error" to the first 446 bytes. You can override this with a custom binary via `boot_code`.
