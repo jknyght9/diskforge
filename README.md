@@ -12,7 +12,7 @@ Define disk layouts, filesystems, encryption, OS templates, and file population 
 
 - MBR, GPT, and RAW (superfloppy) partition table support
 - Primary, extended, and logical partitions
-- Multiple filesystems: FAT32, NTFS, EXT2/3/4, XFS, exFAT, HFS+
+- Multiple filesystems: FAT32, NTFS, EXT2/3/4, XFS, exFAT, btrfs, F2FS, HFS+
 - LUKS encryption (v1/v2) at the partition level
 - VeraCrypt full-disk encryption
 - MBR boot code (generic stub or custom binary)
@@ -197,6 +197,7 @@ Builds all 6 example images, then runs 78 verification checks: partition tables,
 
 ## To Do
 
+- ZFS support (complex packaging — kernel module + userspace tools)
 - Investigate BitLocker support (requires Windows tooling)
 - APFS support (no Linux implementation exists)
 

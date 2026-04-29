@@ -11,7 +11,7 @@ def load_manifest(path):
     return manifest['disks']
 
 def validate_manifest(disks):
-    supported_luks_filesystems = ["ext2", "ext3", "ext4", "xfs"]
+    supported_luks_filesystems = ["ext2", "ext3", "ext4", "xfs", "btrfs", "f2fs"]
 
     for disk in disks:
         for field in ["name", "type", "size"]:

@@ -15,6 +15,8 @@ DiskForge supports the following filesystems for partition formatting.
 | **ext4** | `0x83` | Yes | Yes | `mkfs.ext4` |
 | **XFS** | `0x83` | Yes | Yes | `mkfs.xfs` |
 | **exFAT** | `0x07` | No | No | `mkfs.exfat` |
+| **btrfs** | `0x83` | Yes | Yes | `mkfs.btrfs` |
+| **F2FS** | `0x83` | Yes | No | `mkfs.f2fs` |
 | **HFS+** | `0xAF` | No | No | `mkfs.hfsplus` |
 
 ---
@@ -54,6 +56,22 @@ DiskForge supports the following filesystems for partition formatting.
 - Extended FAT format, no 4GB file limit
 - No journaling, no permissions
 - Mounted via `mount.exfat-fuse` in the container
+
+### btrfs
+
+- Copy-on-write Linux filesystem with snapshots and subvolumes
+- Default on Fedora Workstation and openSUSE
+- Supports LUKS encryption
+- Forensically interesting: CoW means overwritten data may persist in snapshots
+- Growing adoption makes it increasingly relevant in forensic cases
+
+### F2FS
+
+- Flash-Friendly File System, designed for NAND storage
+- Default on many Android devices and Chromebooks
+- Supports LUKS encryption
+- Relevant for mobile and embedded device forensics
+- Optimized for SSDs and SD cards
 
 ### HFS+
 

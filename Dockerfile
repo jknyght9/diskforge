@@ -10,7 +10,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
     cryptsetup python3 python3-pip \
     parted fdisk dosfstools exfatprogs exfat-fuse ntfs-3g \
-    kpartx e2fsprogs sleuthkit udev util-linux xfsprogs wget \
+    kpartx e2fsprogs sleuthkit udev util-linux xfsprogs btrfs-progs f2fs-tools wget \
     sudo libpcsclite1 pcscd \
     && rm -rf /var/lib/apt/lists/*
 

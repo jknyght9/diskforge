@@ -97,7 +97,7 @@ graph LR
 | Feature | Details |
 |---------|---------|
 | **Partition Tables** | MBR (primary, extended, logical), GPT, and RAW (superfloppy) |
-| **Filesystems** | FAT32, NTFS, ext2/3/4, XFS, exFAT, HFS+ |
+| **Filesystems** | FAT32, NTFS, ext2/3/4, XFS, exFAT, btrfs, F2FS, HFS+ |
 | **Encryption** | LUKS v1/v2 (partition-level), VeraCrypt (full-disk) |
 | **Boot Code** | Automatic MBR boot stub with custom override support |
 | **OS Templates** | Windows 10, Windows XP, Linux, macOS directory structures |

@@ -80,6 +80,10 @@ def assign_and_format(part, disk, loopdev):
         subprocess.run(["mkfs.exfat", "-n", label, dev_to_format], check=True)
     elif fs in ("hfsplus", "hfs+"):
         subprocess.run(["mkfs.hfsplus", "-v", label, dev_to_format], check=True)
+    elif fs == "btrfs":
+        subprocess.run(["mkfs.btrfs", "-f", "-L", label, dev_to_format], check=True)
+    elif fs == "f2fs":
+        subprocess.run(["mkfs.f2fs", "-l", label, "-f", dev_to_format], check=True)
     else:
         fail(f"Unsupported filesystem: {fs}")
 
@@ -152,7 +156,9 @@ def get_mbr_type_code(fs):
         "xfs": "83",
         "exfat": "7",
         "hfsplus": "af",
-        "hfs+": "af"
+        "hfs+": "af",
+        "btrfs": "83",
+        "f2fs": "83"
     }.get(fs.lower(), "83")
 
 def write_boot_code(disk, loopdev):

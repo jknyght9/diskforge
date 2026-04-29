@@ -180,6 +180,10 @@ class DiskImage:
             subprocess.run(["mkfs.exfat", "-n", label, loopdev], check=True)
         elif fs in ("hfsplus", "hfs+"):
             subprocess.run(["mkfs.hfsplus", "-v", label, loopdev], check=True)
+        elif fs == "btrfs":
+            subprocess.run(["mkfs.btrfs", "-f", "-L", label, loopdev], check=True)
+        elif fs == "f2fs":
+            subprocess.run(["mkfs.f2fs", "-l", label, "-f", loopdev], check=True)
         else:
             fail(f"Unsupported filesystem for RAW disk: {fs}")
 
