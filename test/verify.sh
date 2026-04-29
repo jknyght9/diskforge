@@ -509,6 +509,61 @@ fi
 # ============================================================
 echo ""
 echo "=========================================="
+echo " VERIFYING: example_inject (unallocated space injection)"
+echo "=========================================="
+
+IMG="/output/example_inject/training_inject.img"
+if [ ! -f "$IMG" ]; then
+    fail "Image not found: $IMG"
+else
+    # Verify hidden data is findable with strings
+    echo ""
+    echo "  --- Hidden data in unallocated space ---"
+    if strings "$IMG" | grep -q "BitLocker Recovery Key"; then
+        pass "Found BitLocker Recovery Key in raw image"
+    else
+        fail "BitLocker Recovery Key not found in raw image"
+    fi
+
+    if strings "$IMG" | grep -q "Tr4ining"; then
+        pass "Found hidden password in raw image"
+    else
+        fail "Hidden password not found in raw image"
+    fi
+
+    # Verify hidden data is NOT visible in the mounted filesystem
+    LOOP=$(losetup --find --show "$IMG")
+    kpartx -a "$LOOP"
+    LOOPBASE=$(basename "$LOOP")
+
+    MNT=$(mktemp -d)
+    if mount "/dev/mapper/${LOOPBASE}p1" "$MNT" 2>/dev/null; then
+        # Search all files on the filesystem for the hidden string
+        if grep -r "BitLocker Recovery Key" "$MNT" 2>/dev/null; then
+            fail "Hidden data visible in filesystem (should only be in unallocated space)"
+        else
+            pass "Hidden data NOT visible in filesystem (correct)"
+        fi
+        cleanup_mount "$MNT"
+    else
+        fail "Could not mount partition for inject verification"
+        rmdir "$MNT" 2>/dev/null || true
+    fi
+
+    # Verify partition table shows unallocated gap
+    if mmls "$IMG" 2>/dev/null | grep -q "Unallocated"; then
+        pass "Unallocated space visible in partition table"
+    else
+        fail "No unallocated space shown in partition table"
+    fi
+
+    kpartx -d "$LOOP"
+    losetup -d "$LOOP"
+fi
+
+# ============================================================
+echo ""
+echo "=========================================="
 echo " VERIFYING: example_mbr (boot code)"
 echo "=========================================="
 

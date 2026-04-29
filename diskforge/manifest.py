@@ -116,6 +116,21 @@ def validate_manifest(disks):
             if template_name:
                 _validate_template(template_name, disk["name"], part["number"])
 
+        # Validate inject entries
+        for entry in disk.get("inject", []):
+            if entry.get("location") != "unallocated":
+                fail(f"Unsupported inject location '{entry.get('location')}' in disk '{disk['name']}'. Supported: unallocated")
+            if not entry.get("data") and not entry.get("source"):
+                fail(f"Inject entry in disk '{disk['name']}' must have either 'data' or 'source'")
+            if entry.get("data") and entry.get("source"):
+                fail(f"Inject entry in disk '{disk['name']}' cannot have both 'data' and 'source'")
+            if entry.get("source") and not os.path.exists(entry["source"]):
+                fail(f"Inject source file not found: {entry['source']} in disk '{disk['name']}'")
+            if entry.get("offset") is not None and (not isinstance(entry["offset"], int) or entry["offset"] < 0):
+                fail(f"Inject offset must be a non-negative integer in disk '{disk['name']}'")
+            if disk["type"] == "RAW":
+                fail(f"Cannot inject into unallocated space on RAW disk '{disk['name']}' (no partition table)")
+
 def _validate_template(template_name, disk_name, part_id):
     """Check that a template JSON file exists."""
     search_paths = ["/app/templates", "/templates", "templates"]

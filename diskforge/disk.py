@@ -194,6 +194,11 @@ class DiskImage:
     def populate(self):
         populate_disk(self.disk)
 
+    def inject(self):
+        if self.disk.get("inject"):
+            from .injector import inject_unallocated
+            inject_unallocated(self.disk)
+
     def cleanup(self):
         print(f"[*] Cleaning up: {self.disk['name']}", file=sys.stdout, flush=True)
 
