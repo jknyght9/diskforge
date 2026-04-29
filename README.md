@@ -199,6 +199,13 @@ Builds all 9 example images, then runs 99 verification checks: partition tables,
 
 ---
 
+## Requirements
+
+- Docker (Desktop or Engine)
+- `--privileged` flag required for loop device and partition operations
+
+---
+
 ## To Do
 
 - ZFS support (complex packaging — kernel module + userspace tools)
