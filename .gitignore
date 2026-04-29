@@ -14,3 +14,7 @@ output/
 
 # MkDocs build output
 site/
+
+# AI context
+CLAUDE.md
+.claude/

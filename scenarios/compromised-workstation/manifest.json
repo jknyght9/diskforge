@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.0",
+  "disks": [
+    {
+      "name": "compromised-workstation",
+      "type": "GPT",
+      "size": "1G",
+      "inject_unallocated": [
+        {
+          "data": "C2_SERVER=10.13.37.100:8443\nBEACON_INTERVAL=60\nEXFIL_KEY=aGVsbG8gd29ybGQ=",
+          "offset": "85%"
+        }
+      ],
+      "partitions": [
+        {
+          "number": 1,
+          "type": "primary",
+          "filesystem": "ntfs",
+          "label": "SYSTEM",
+          "size": "750M",
+          "populate": {
+            "template": "windows10",
+            "add_files": [
+              { "source": "/files/evtx/*", "target": "/Windows/System32/winevt/Logs" },
+              { "source": "/files/prefetch/*", "target": "/Windows/Prefetch" },
+              { "source": "/files/malware/beacon.exe", "target": "/Users/jsmith/AppData/Local/Temp" },
+              { "source": "/files/docs/*", "target": "/Users/jsmith/Documents" }
+            ],
+            "delete_files": [
+              "/Users/jsmith/AppData/Local/Temp/beacon.exe"
+            ]
+          }
+        },
+        {
+          "number": 2,
+          "type": "primary",
+          "filesystem": "ext4",
+          "label": "BACKUP",
+          "size": "200M",
+          "encrypt": {
+            "type": "luks",
+            "version": "2",
+            "passphrase": "backup2024!"
+          },
+          "populate": {
+            "add_files": [
+              { "source": "/files/exfil/*", "target": "/staged" }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

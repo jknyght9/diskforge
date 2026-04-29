@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Events>
+  <!-- Windows Update service starting -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Service Control Manager" Guid="{555908D1-A6D7-4695-8E1E-26931D2012F4}" EventSourceName="Service Control Manager"/>
+      <EventID Qualifiers="16384">7036</EventID>
+      <Version>0</Version>
+      <Level>4</Level>
+      <Task>0</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8080000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T00:00:05.331Z"/>
+      <EventRecordID>28401</EventRecordID>
+      <Channel>System</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="param1">Windows Update</Data>
+      <Data Name="param2">running</Data>
+    </EventData>
+  </Event>
+
+  <!-- Windows Update completing -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-WindowsUpdateClient" Guid="{945A8954-C147-4ACD-923F-40C45405A658}"/>
+      <EventID>19</EventID>
+      <Version>0</Version>
+      <Level>4</Level>
+      <Task>1</Task>
+      <Opcode>13</Opcode>
+      <Keywords>0x8000000000000018</Keywords>
+      <TimeCreated SystemTime="2025-03-15T00:05:42.871Z"/>
+      <EventRecordID>28403</EventRecordID>
+      <Channel>System</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security UserID="S-1-5-18"/>
+    </System>
+    <EventData>
+      <Data Name="updateTitle">2025-03 Cumulative Update for Windows 10 Version 22H2 (KB5035845)</Data>
+      <Data Name="updateRevisionNumber">201</Data>
+    </EventData>
+  </Event>
+
+  <!-- Scheduled defrag service -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Service Control Manager" Guid="{555908D1-A6D7-4695-8E1E-26931D2012F4}" EventSourceName="Service Control Manager"/>
+      <EventID Qualifiers="16384">7036</EventID>
+      <Version>0</Version>
+      <Level>4</Level>
+      <Task>0</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8080000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T01:00:02.104Z"/>
+      <EventRecordID>28407</EventRecordID>
+      <Channel>System</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="param1">Optimize drives</Data>
+      <Data Name="param2">running</Data>
+    </EventData>
+  </Event>
+
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Service Control Manager" Guid="{555908D1-A6D7-4695-8E1E-26931D2012F4}" EventSourceName="Service Control Manager"/>
+      <EventID Qualifiers="16384">7036</EventID>
+      <Version>0</Version>
+      <Level>4</Level>
+      <Task>0</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8080000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T01:02:18.556Z"/>
+      <EventRecordID>28408</EventRecordID>
+      <Channel>System</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="param1">Optimize drives</Data>
+      <Data Name="param2">stopped</Data>
+    </EventData>
+  </Event>
+
+  <!-- Remote Desktop Services starting for attacker session -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Service Control Manager" Guid="{555908D1-A6D7-4695-8E1E-26931D2012F4}" EventSourceName="Service Control Manager"/>
+      <EventID Qualifiers="16384">7036</EventID>
+      <Version>0</Version>
+      <Level>4</Level>
+      <Task>0</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8080000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T02:19:38.201Z"/>
+      <EventRecordID>28412</EventRecordID>
+      <Channel>System</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="param1">Remote Desktop Services</Data>
+      <Data Name="param2">running</Data>
+    </EventData>
+  </Event>
+
+  <!-- SUSPICIOUS: New service installed by attacker for persistence -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Service Control Manager" Guid="{555908D1-A6D7-4695-8E1E-26931D2012F4}" EventSourceName="Service Control Manager"/>
+      <EventID Qualifiers="16384">7045</EventID>
+      <Version>0</Version>
+      <Level>4</Level>
+      <Task>0</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8080000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T02:22:14.887Z"/>
+      <EventRecordID>28414</EventRecordID>
+      <Channel>System</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security UserID="S-1-5-21-3623811015-3361044348-30300820-1122"/>
+    </System>
+    <EventData>
+      <Data Name="ServiceName">WindowsSystemUpdate</Data>
+      <Data Name="ImagePath">C:\Users\jsmith\AppData\Local\Temp\beacon.exe -svc</Data>
+      <Data Name="ServiceType">user mode service</Data>
+      <Data Name="StartType">auto start</Data>
+      <Data Name="AccountName">LocalSystem</Data>
+    </EventData>
+  </Event>
+
+  <!-- Service started -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Service Control Manager" Guid="{555908D1-A6D7-4695-8E1E-26931D2012F4}" EventSourceName="Service Control Manager"/>
+      <EventID Qualifiers="16384">7036</EventID>
+      <Version>0</Version>
+      <Level>4</Level>
+      <Task>0</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8080000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T02:22:15.102Z"/>
+      <EventRecordID>28415</EventRecordID>
+      <Channel>System</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="param1">WindowsSystemUpdate</Data>
+      <Data Name="param2">running</Data>
+    </EventData>
+  </Event>
+
+  <!-- Normal DHCP renewal -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Dhcp-Client" Guid="{15A7A4F8-0072-4EAB-ABAD-F98A4D666AED}"/>
+      <EventID>50036</EventID>
+      <Version>0</Version>
+      <Level>4</Level>
+      <Task>0</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8000000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T04:00:01.223Z"/>
+      <EventRecordID>28420</EventRecordID>
+      <Channel>System</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security UserID="S-1-5-19"/>
+    </System>
+    <EventData>
+      <Data Name="InterfaceGuid">{4E2A1B3C-8D9E-4F5A-B6C7-1D2E3F4A5B6C}</Data>
+      <Data Name="HWAddress">00155D0A1234</Data>
+      <Data Name="Address">10.0.1.25</Data>
+      <Data Name="LeaseTime">86400</Data>
+    </EventData>
+  </Event>
+
+  <!-- Windows Time service -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Microsoft-Windows-Time-Service" Guid="{06EDCFEB-0FD0-4E53-ACCA-A6F8BBF81BCB}"/>
+      <EventID>35</EventID>
+      <Version>0</Version>
+      <Level>4</Level>
+      <Task>0</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8000000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T05:00:03.441Z"/>
+      <EventRecordID>28425</EventRecordID>
+      <Channel>System</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security UserID="S-1-5-19"/>
+    </System>
+    <EventData>
+      <Data Name="TimeSource">dc01.corp.local,0x8</Data>
+      <Data Name="Accuracy">100</Data>
+    </EventData>
+  </Event>
+
+  <!-- Windows Update service stopping -->
+  <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+    <System>
+      <Provider Name="Service Control Manager" Guid="{555908D1-A6D7-4695-8E1E-26931D2012F4}" EventSourceName="Service Control Manager"/>
+      <EventID Qualifiers="16384">7036</EventID>
+      <Version>0</Version>
+      <Level>4</Level>
+      <Task>0</Task>
+      <Opcode>0</Opcode>
+      <Keywords>0x8080000000000000</Keywords>
+      <TimeCreated SystemTime="2025-03-15T06:00:11.992Z"/>
+      <EventRecordID>28430</EventRecordID>
+      <Channel>System</Channel>
+      <Computer>WORKSTATION01.corp.local</Computer>
+      <Security/>
+    </System>
+    <EventData>
+      <Data Name="param1">Windows Update</Data>
+      <Data Name="param2">stopped</Data>
+    </EventData>
+  </Event>
+</Events>
