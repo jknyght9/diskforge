@@ -1,3 +1,5 @@
+![DiskForge](./media/diskforge.png)
+
 # DiskForge
 
 **DiskForge** is a Python-based tool for generating partitioned and encrypted disk images for digital forensics training, incident response simulations, CTF challenges, and lab environments.
