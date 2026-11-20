@@ -22,12 +22,12 @@ Digital forensics training tool that builds disk images from JSON manifests. Run
 ## Build & run
 
 ```bash
-docker build -t disk-builder .
+docker build -t diskforge .
 docker run --rm --privileged \
   -v "$(pwd)/files:/files" \
   -v "$(pwd)/manifest.json:/manifests/manifest.json" \
   -v "$(pwd)/output:/output" \
-  disk-builder /manifests/manifest.json
+  diskforge /manifests/manifest.json
 ```
 
 ## Test

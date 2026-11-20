@@ -1,5 +1,5 @@
 #!/bin/bash
-# Verification script for diskbuilder images
+# Verification script for diskforge images
 # Runs inside the Docker container to validate built images
 set -euo pipefail
 
