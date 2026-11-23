@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0",
+  "disks": [
+    {
+      "name": "usb_exfil",
+      "label": "USBExfil",
+      "type": "GPT",
+      "size": "256M",
+      "watermark": { "owner": "IS4483 Digital Forensics", "file": true },
+      "partitions": [
+        {
+          "number": 1,
+          "type": "primary",
+          "filesystem": "fat32",
+          "label": "USBDATA",
+          "size": "100M",
+          "populate": {
+            "add_files": [
+              { "source": "/files/doc1.docx", "target": "/" },
+              { "source": "/files/transfer_notes.txt", "target": "/" }
+            ]
+          },
+          "countermeasure": { "type": "fat_dir_zero", "hide": ["transfer_notes.txt"] }
+        },
+        {
+          "number": 2,
+          "type": "primary",
+          "filesystem": "ntfs",
+          "label": "ARCHIVE",
+          "size": "120M",
+          "populate": {
+            "add_files": [
+              { "source": "/files/doc1.docx", "target": "/Documents" },
+              { "source": "/files/text1.txt", "target": "/Documents" },
+              { "source": "/files/zz_ledger.xlsx", "target": "/Documents" }
+            ]
+          },
+          "countermeasure": {
+            "type": "ntfs_index_truncate",
+            "path": "/Documents",
+            "hide": ["zz_ledger.xlsx"]
+          }
+        }
+      ],
+      "inject": [
+        { "location": "unallocated", "data": "dropbox upload complete: zz_ledger.xlsx", "offset": 0 }
+      ]
+    }
+  ]
+}
