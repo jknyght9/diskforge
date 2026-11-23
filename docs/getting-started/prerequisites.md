@@ -14,7 +14,7 @@
 
 ## What's Inside the Container
 
-The Docker image (Debian Bullseye) includes:
+The Docker image (Debian Bookworm) includes:
 
 | Tool | Purpose |
 |------|---------|

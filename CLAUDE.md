@@ -1,6 +1,6 @@
 # DiskForge
 
-Digital forensics training tool that builds disk images from JSON manifests. Runs inside a privileged Docker container (Debian Bullseye).
+Digital forensics training tool that builds disk images from JSON manifests. Runs inside a privileged Docker container (Debian Bookworm).
 
 ## Architecture
 

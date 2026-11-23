@@ -1,35 +1,26 @@
 # syntax=docker/dockerfile:1.4
-# Bullseye for macOS compatability
-# Use Debian Bullseye for better compatibility
-FROM debian:bullseye
+FROM debian:bookworm
 
 ARG TARGETARCH
 
 # Install required system packages
 ENV DEBIAN_FRONTEND=noninteractive
-# Bullseye reached end of life; its packages now live on archive.debian.org
-RUN sed -i 's|deb.debian.org|archive.debian.org|g' /etc/apt/sources.list
+# hfsprogs lives in non-free (APSL license)
+RUN sed -i 's/^Components: main$/Components: main non-free/' /etc/apt/sources.list.d/debian.sources
 RUN apt-get update && apt-get install -y \
     cryptsetup python3 python3-pip \
     parted fdisk dosfstools exfatprogs exfat-fuse ntfs-3g \
     kpartx e2fsprogs sleuthkit udev util-linux xfsprogs btrfs-progs f2fs-tools wget \
-    sudo libpcsclite1 pcscd \
+    sudo libpcsclite1 pcscd hfsprogs \
     && rm -rf /var/lib/apt/lists/*
-
-# Install hfsprogs from Buster repo (removed from Bullseye+)
-RUN echo "deb http://archive.debian.org/debian buster main" > /etc/apt/sources.list.d/buster.list && \
-    apt-get update -o Acquire::Check-Valid-Until=false && \
-    apt-get install -y -t buster hfsprogs && \
-    rm /etc/apt/sources.list.d/buster.list && \
-    rm -rf /var/lib/apt/lists/*
 
 # Download and install VeraCrypt CLI only (no GUI)
 RUN if [ "$TARGETARCH" = "amd64" ]; then \
       echo "Installing VeraCrypt AMD64" && \
-      wget https://launchpad.net/veracrypt/trunk/1.26.20/+download/veracrypt-console-1.26.20-Debian-11-amd64.deb -O /tmp/veracrypt.deb ; \
+      wget https://launchpad.net/veracrypt/trunk/1.26.20/+download/veracrypt-console-1.26.20-Debian-12-amd64.deb -O /tmp/veracrypt.deb ; \
     elif [ "$TARGETARCH" = "arm64" ]; then \
       echo "Installing VeraCrypt ARM64" && \
-      wget https://launchpad.net/veracrypt/trunk/1.26.20/+download/veracrypt-console-1.26.20-Debian-11-arm64.deb -O /tmp/veracrypt.deb ; \
+      wget https://launchpad.net/veracrypt/trunk/1.26.20/+download/veracrypt-console-1.26.20-Debian-12-arm64.deb -O /tmp/veracrypt.deb ; \
     else \
       echo "Unsupported architecture: $TARGETARCH" && exit 1; \
     fi && \

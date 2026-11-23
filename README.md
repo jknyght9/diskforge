@@ -33,7 +33,16 @@ Define disk layouts, filesystems, encryption, OS templates, and file population 
 
 ## Quick Start
 
-### 1. Clone and build
+### 1. Get the image
+
+Pull the published image (amd64 + arm64) and tag it `diskforge`:
+
+```bash
+docker pull ghcr.io/jknyght9/diskforge:latest
+docker tag ghcr.io/jknyght9/diskforge:latest diskforge
+```
+
+Or clone and build it yourself:
 
 ```bash
 git clone https://github.com/jknyght9/diskforge.git
@@ -237,7 +246,6 @@ Tools: `validate_manifest`, `build`, `list_templates`, `list_examples`. See [MCP
 - ZFS support (complex packaging: kernel module + userspace tools)
 - Investigate BitLocker support (requires Windows tooling)
 - APFS support (no Linux implementation exists)
-- Upgrade the container from Debian Bullseye ([#8](https://github.com/jknyght9/diskforge/issues/8))
 
 ---
 

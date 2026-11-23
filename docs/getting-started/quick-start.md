@@ -11,11 +11,22 @@ git clone https://github.com/jknyght9/diskforge.git
 cd diskforge
 ```
 
-## 2. Build the Docker Image
+## 2. Get the Docker Image
+
+Pull the published image (amd64 + arm64) and tag it `diskforge`:
+
+```bash
+docker pull ghcr.io/jknyght9/diskforge:latest
+docker tag ghcr.io/jknyght9/diskforge:latest diskforge
+```
+
+Or build it from the checkout:
 
 ```bash
 docker build -t diskforge .
 ```
+
+Release tags are published too, e.g. `ghcr.io/jknyght9/diskforge:1.3.0`. Pin one to rebuild a scenario with the exact toolchain it was made with.
 
 ## 3. Add Source Files
 

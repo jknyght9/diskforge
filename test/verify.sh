@@ -621,6 +621,46 @@ check_hidden_on_mount() {
     sleep 1  # let the FUSE driver release the device
 }
 
+# Names an END-terminated walk of a directory's $I30 index returns, the way
+# Windows lists a directory. Reads the raw device with DiskForge's own parser.
+ntfs_walk_has() {
+    local dev="$1" path="$2"
+    PYTHONPATH=/app python3 - "$dev" "$path" <<'PY'
+import sys
+from diskforge.countermeasures import _ntfs_volume, _ntfs_leaf, _ntfs_entries
+dev, path = sys.argv[1], sys.argv[2].split("/")
+with open(dev, "rb") as f:
+    vol, mft = _ntfs_volume(f), 5
+    for i, name in enumerate(path):
+        buf, node, _ = _ntfs_leaf(f, vol, mft)
+        match = [e for e in _ntfs_entries(buf, node) if e["name"] == name]
+        if not match:
+            sys.exit(3)  # not listed; any other failure exits 1
+        mft = match[0]["ref"]
+PY
+}
+
+# Patched ntfs-3g (Debian, CVE-2026-46572) refuses an index whose END entry does
+# not end the in-use area, which is exactly what ntfs_index_flag leaves behind.
+# The partition cannot be mounted on Linux, so check what a Windows-style walk sees.
+check_flag_partition() {
+    local dev="$1" visible="$2" hidden="$3"
+    local mnt out
+    mnt=$(mktemp -d)
+    if out=$(ntfs-3g -o ro "$dev" "$mnt" 2>&1); then
+        fail "ntfs-3g mounted a flagged index (expected the strict END check to refuse it)"
+        umount "$mnt"
+    elif echo "$out" | grep -q "Corrupt index entry stream"; then
+        pass "ntfs-3g refuses the flagged index (Corrupt index entry stream)"
+    else
+        fail "ntfs-3g failed for another reason: $out"
+    fi
+    rmdir "$mnt"
+    for f in $visible; do check "$f listed by an END-terminated index walk" ntfs_walk_has "$dev" "$f"; done
+    for f in $hidden; do check "$f hidden from an END-terminated index walk" bash -c "ntfs_walk_has '$dev' '$f'; [ \$? -eq 3 ]"; done
+}
+export -f ntfs_walk_has
+
 IMG="/output/example_countermeasures/training_countermeasures.img"
 if [ ! -f "$IMG" ]; then
     fail "Image not found: $IMG"
@@ -644,9 +684,8 @@ else
 
     echo ""
     echo "  --- Partition 3: NTFS ntfs_index_flag ---"
-    check_hidden_on_mount "${P}3" ntfs "doc1.docx copyofdocument1.docx text1.txt images/pic1.jpg" "zip1.zip"
+    check_flag_partition "${P}3" "doc1.docx copyofdocument1.docx text1.txt images/pic1.jpg" "zip1.zip"
     check "TSK still lists zip1.zip" bash -c "fls '${P}3' | grep -q 'zip1.zip'"
-    check "ntfsfix accepts the volume" ntfsfix -n "${P}3"
 
     echo ""
     echo "  --- Partition 4: NTFS ntfs_index_truncate ---"
@@ -654,6 +693,7 @@ else
     for f in text1.txt zip1.zip; do
         check "TSK recovers $f from index slack (unallocated name)" bash -c "fls '${P}4' | grep -qE '^-/r .*$f$'"
     done
+    check "ntfsfix accepts the truncated index (passes the strict END check)" ntfsfix -n "${P}4"
 
     kpartx -d "$LOOP"
     losetup -d "$LOOP"
@@ -685,16 +725,14 @@ else
 
     echo ""
     echo "  --- Subdirectory, partition 3: NTFS ntfs_index_flag ---"
-    check_hidden_on_mount "${P}3" ntfs "$SUB_VISIBLE" "images/pic1.jpg zip1.zip"
+    check_flag_partition "${P}3" "$SUB_VISIBLE" "images/pic1.jpg zip1.zip"
     check "TSK still lists images/pic1.jpg" bash -c "fls '${P}3' \$(ifind -n images '${P}3') | grep -q 'pic1.jpg'"
-    check "ntfsfix accepts the volume" ntfsfix -n "${P}3"
 
     echo ""
     echo "  --- Subdirectory, partition 4: NTFS, truncate in /images and flag in / ---"
-    check_hidden_on_mount "${P}4" ntfs "$SUB_VISIBLE" "images/pic1.jpg zip1.zip"
+    check_flag_partition "${P}4" "$SUB_VISIBLE" "images/pic1.jpg zip1.zip"
     check "TSK recovers images/pic1.jpg from index slack (unallocated name)" bash -c "fls '${P}4' \$(ifind -n images '${P}4') | grep -qE '^-/r .*pic1.jpg$'"
     check "TSK still lists zip1.zip (flag method)" bash -c "fls '${P}4' | grep -qE '^r/r .*zip1.zip$'"
-    check "ntfsfix accepts the volume" ntfsfix -n "${P}4"
 
     kpartx -d "$LOOP"
     losetup -d "$LOOP"

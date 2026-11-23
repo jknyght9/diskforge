@@ -37,6 +37,11 @@ NTFS lists a directory by walking its `$I30` index until it reaches an entry fla
 
 Pick one method per directory. Different directories on the same volume can use different methods.
 
+!!! warning "`ntfs_index_flag` volumes do not mount on patched Linux"
+    Current ntfs-3g builds (Debian's fix for CVE-2026-46572, November 2026, and upstream ntfs-3g after June 2026) require a directory's END entry to finish the in-use part of its index. `ntfs_index_flag` leaves the hidden entries after the END entry, so ntfs-3g reports `Corrupt index entry stream` and refuses to mount the volume. TSK still reads it. The method targets Windows, which reads an index until it reaches the END entry. It has not been tested on Windows.
+
+    That refusal is a real tell, and a useful teaching point. When a volume has to mount on Linux, use `ntfs_index_truncate`. Its END entry ends the in-use area exactly, so it passes the check.
+
 !!! warning "NTFS index entries are sorted by name"
     An NTFS index is kept in name order, so these methods hide the cut entry and **everything that sorts after it**. Every file in `hide` must sort after every visible file in that directory. DiskForge checks this and stops the build if a visible file would be hidden too. Name hidden files so they sort last, for example `zz_secret.txt` or `~notes.txt`.
 
