@@ -1,0 +1,247 @@
+{
+  "schema_version": "1.0",
+  "disks": [
+    {
+      "name": "training_countermeasures",
+      "label": "CountermeasuresExample",
+      "type": "GPT",
+      "size": "512M",
+      "partitions": [
+        {
+          "number": 1,
+          "type": "primary",
+          "filesystem": "fat32",
+          "label": "CM_FAT32",
+          "size": "100M",
+          "populate": {
+            "add_files": [
+              {
+                "source": "/files/*",
+                "target": "/"
+              }
+            ]
+          },
+          "countermeasure": {
+            "type": "fat_dir_zero",
+            "hide": [
+              "doc1.docx",
+              "copyofdocument1.docx"
+            ]
+          }
+        },
+        {
+          "number": 2,
+          "type": "primary",
+          "filesystem": "exfat",
+          "label": "CM_EXFAT",
+          "size": "100M",
+          "populate": {
+            "add_files": [
+              {
+                "source": "/files/*",
+                "target": "/"
+              }
+            ]
+          },
+          "countermeasure": {
+            "type": "fat_dir_zero",
+            "hide": [
+              "doc1.docx"
+            ]
+          }
+        },
+        {
+          "number": 3,
+          "type": "primary",
+          "filesystem": "ntfs",
+          "label": "CM_NTFS_FLAG",
+          "size": "100M",
+          "populate": {
+            "add_files": [
+              {
+                "source": "/files/*",
+                "target": "/"
+              }
+            ]
+          },
+          "countermeasure": {
+            "type": "ntfs_index_flag",
+            "hide": [
+              "zip1.zip"
+            ]
+          }
+        },
+        {
+          "number": 4,
+          "type": "primary",
+          "filesystem": "ntfs",
+          "label": "CM_NTFS_TRUNC",
+          "size": "100M",
+          "populate": {
+            "add_files": [
+              {
+                "source": "/files/*",
+                "target": "/"
+              }
+            ]
+          },
+          "countermeasure": {
+            "type": "ntfs_index_truncate",
+            "hide": [
+              "text1.txt",
+              "zip1.zip"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "training_countermeasures_subdir",
+      "label": "CountermeasuresSubdir",
+      "type": "GPT",
+      "size": "512M",
+      "partitions": [
+        {
+          "number": 1,
+          "type": "primary",
+          "filesystem": "fat32",
+          "label": "CS_FAT32",
+          "size": "100M",
+          "populate": {
+            "add_files": [
+              {
+                "source": "/files/*",
+                "target": "/"
+              },
+              {
+                "source": "/files/*.docx",
+                "target": "/images"
+              }
+            ]
+          },
+          "countermeasure": [
+            {
+              "type": "fat_dir_zero",
+              "path": "/",
+              "hide": [
+                "images"
+              ]
+            },
+            {
+              "type": "fat_dir_zero",
+              "path": "/images",
+              "hide": [
+                "pic1.jpg"
+              ]
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "type": "primary",
+          "filesystem": "exfat",
+          "label": "CS_EXFAT",
+          "size": "100M",
+          "populate": {
+            "add_files": [
+              {
+                "source": "/files/*",
+                "target": "/"
+              },
+              {
+                "source": "/files/*.docx",
+                "target": "/images"
+              }
+            ]
+          },
+          "countermeasure": [
+            {
+              "type": "fat_dir_zero",
+              "path": "/images",
+              "hide": [
+                "pic1.jpg"
+              ]
+            },
+            {
+              "type": "fat_dir_zero",
+              "path": "/",
+              "hide": [
+                "zip1.zip"
+              ]
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "type": "primary",
+          "filesystem": "ntfs",
+          "label": "CS_NTFS_FLAG",
+          "size": "100M",
+          "populate": {
+            "add_files": [
+              {
+                "source": "/files/*",
+                "target": "/"
+              },
+              {
+                "source": "/files/*.docx",
+                "target": "/images"
+              }
+            ]
+          },
+          "countermeasure": [
+            {
+              "type": "ntfs_index_flag",
+              "path": "/images",
+              "hide": [
+                "pic1.jpg"
+              ]
+            },
+            {
+              "type": "ntfs_index_flag",
+              "path": "/",
+              "hide": [
+                "zip1.zip"
+              ]
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "type": "primary",
+          "filesystem": "ntfs",
+          "label": "CS_NTFS_TRUNC",
+          "size": "100M",
+          "populate": {
+            "add_files": [
+              {
+                "source": "/files/*",
+                "target": "/"
+              },
+              {
+                "source": "/files/*.docx",
+                "target": "/images"
+              }
+            ]
+          },
+          "countermeasure": [
+            {
+              "type": "ntfs_index_truncate",
+              "path": "/images",
+              "hide": [
+                "pic1.jpg"
+              ]
+            },
+            {
+              "type": "ntfs_index_flag",
+              "path": "/",
+              "hide": [
+                "zip1.zip"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -35,6 +35,8 @@ def validate_manifest(disks):
             template_name = disk.get("populate", {}).get("template")
             if template_name:
                 _validate_template(template_name, disk["name"], "raw")
+            if disk.get("countermeasure"):
+                _validate_countermeasures(disk["countermeasure"], disk["filesystem"], disk["name"], "raw")
             continue
 
         # MBR/GPT disks require partitions
@@ -116,6 +118,11 @@ def validate_manifest(disks):
             if template_name:
                 _validate_template(template_name, disk["name"], part["number"])
 
+            if part.get("countermeasure"):
+                if disk_encrypt == "veracrypt":
+                    fail(f"Countermeasures are not supported on VeraCrypt-encrypted disk '{disk['name']}'")
+                _validate_countermeasures(part["countermeasure"], fs, disk["name"], part["number"])
+
         # Validate inject entries
         for entry in disk.get("inject", []):
             if entry.get("location") != "unallocated":
@@ -130,6 +137,47 @@ def validate_manifest(disks):
                 fail(f"Inject offset must be a non-negative integer in disk '{disk['name']}'")
             if disk["type"] == "RAW":
                 fail(f"Cannot inject into unallocated space on RAW disk '{disk['name']}' (no partition table)")
+
+COUNTERMEASURE_FILESYSTEMS = {
+    "fat_dir_zero": ["fat32", "exfat"],
+    "ntfs_index_flag": ["ntfs"],
+    "ntfs_index_truncate": ["ntfs"],
+}
+
+def _validate_countermeasures(value, fs, disk_name, part_id):
+    """Accept one countermeasure object or a list of them, at most one per directory."""
+    cms = value if isinstance(value, list) else [value]
+    if not cms or not all(isinstance(cm, dict) for cm in cms):
+        fail(f"'countermeasure' in disk '{disk_name}' partition {part_id} must be an object or a list of objects")
+    seen = set()
+    for cm in cms:
+        _validate_countermeasure(cm, fs, disk_name, part_id)
+        directory = "/" + "/".join(p for p in cm.get("path", "/").split("/") if p)
+        if directory in seen:
+            fail(f"Disk '{disk_name}' partition {part_id} has more than one countermeasure for '{directory}'. "
+                 "Use one entry per directory and list every file in its 'hide'.")
+        seen.add(directory)
+
+def _validate_countermeasure(cm, fs, disk_name, part_id):
+    """Check a countermeasure block: known type, matching filesystem, directory path, file names."""
+    where = f"disk '{disk_name}' partition {part_id}"
+    method = cm.get("type")
+    if method not in COUNTERMEASURE_FILESYSTEMS:
+        fail(f"Unknown countermeasure type '{method}' in {where}. "
+             f"Supported: {', '.join(COUNTERMEASURE_FILESYSTEMS)}")
+    if fs.lower() not in COUNTERMEASURE_FILESYSTEMS[method]:
+        fail(f"Countermeasure '{method}' requires filesystem {' or '.join(COUNTERMEASURE_FILESYSTEMS[method])}, "
+             f"but {where} is '{fs}'")
+    hide = cm.get("hide")
+    if not hide or not isinstance(hide, list) or not all(isinstance(h, str) and h for h in hide):
+        fail(f"Countermeasure in {where} requires a non-empty 'hide' list of file names")
+    for h in hide:
+        if "/" in h.strip("/"):
+            fail(f"Countermeasure in {where}: '{h}' must be a name inside 'path', not a path")
+    cm["hide"] = [h.strip("/") for h in hide]
+    path = cm.get("path", "/")
+    if not isinstance(path, str) or any(p in (".", "..") for p in path.split("/")):
+        fail(f"Countermeasure in {where}: 'path' must be a directory path like \"/Documents\"")
 
 def _validate_template(template_name, disk_name, part_id):
     """Check that a template JSON file exists."""

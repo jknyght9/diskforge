@@ -168,6 +168,10 @@ class DiskImage:
 
         print(f"[*] Formatting raw disk as {fs}")
 
+        # A reused loop device can keep stale kernel partitions from an earlier
+        # partitioned image, which makes mkfs refuse the whole device
+        subprocess.run(["partx", "-d", loopdev], check=False, stderr=subprocess.DEVNULL)
+
         if fs == "fat32":
             subprocess.run(["mkfs.vfat", "-F32", "-n", label, loopdev], check=True)
         elif fs == "ntfs":
@@ -193,6 +197,19 @@ class DiskImage:
 
     def populate(self):
         populate_disk(self.disk)
+
+    def apply_countermeasures(self):
+        if self.disk.get("type") == "RAW":
+            targets = [self.disk]
+        else:
+            targets = []
+            for part in self.disk["partitions"]:
+                targets.extend(part.get("partitions", []) if part["type"] == "extended" else [part])
+        targets = [t for t in targets if t.get("countermeasure")]
+        if targets:
+            from .countermeasures import apply_countermeasure
+            for part in targets:
+                apply_countermeasure(part)
 
     def inject(self):
         if self.disk.get("inject"):

@@ -20,6 +20,7 @@ Define disk layouts, filesystems, encryption, OS templates, and file population 
 - MBR boot code (generic stub or custom binary)
 - OS directory templates: Windows 10, Windows XP, Linux, macOS
 - Unallocated space injection (hide passwords, recovery keys, artifacts)
+- Filesystem countermeasures: hide directory entries on FAT32, exFAT, and NTFS
 - File population with add, copy, move, and delete operations
 - Wildcard and glob pattern support for file operations
 - Multi-disk builds from a single manifest
@@ -165,6 +166,7 @@ Disks with no partition table — filesystem written directly to the device:
 | `examples/example_btrfs/` | btrfs with Linux template |
 | `examples/example_f2fs/` | F2FS filesystem |
 | `examples/example_inject/` | Hidden data in unallocated space |
+| `examples/example_countermeasures/` | Hidden directory entries on FAT32, exFAT, and NTFS |
 
 ---
 

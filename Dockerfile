@@ -7,6 +7,8 @@ ARG TARGETARCH
 
 # Install required system packages
 ENV DEBIAN_FRONTEND=noninteractive
+# Bullseye reached end of life; its packages now live on archive.debian.org
+RUN sed -i 's|deb.debian.org|archive.debian.org|g' /etc/apt/sources.list
 RUN apt-get update && apt-get install -y \
     cryptsetup python3 python3-pip \
     parted fdisk dosfstools exfatprogs exfat-fuse ntfs-3g \

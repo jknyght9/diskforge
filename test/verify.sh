@@ -590,6 +590,119 @@ fi
 # ============================================================
 echo ""
 echo "=========================================="
+echo " VERIFYING: example_countermeasures (hidden root entries)"
+echo "=========================================="
+
+# Hidden name still present in raw bytes. Searches the first 5 characters as
+# UTF-16LE, which sit contiguously in both a FAT LFN slot and an exFAT name entry.
+raw_has_name() {
+    python3 -c 'import sys; sys.exit(0 if sys.argv[2][:5].encode("utf-16-le") in open(sys.argv[1],"rb").read() else 1)' "$1" "$2"
+}
+
+# Mount a partition, then check visible files are listed and hidden ones are not
+check_hidden_on_mount() {
+    local dev="$1" fs="$2" visible="$3" hidden="$4"
+    local mnt
+    mnt=$(mktemp -d)
+    if [ "$fs" = "exfat" ]; then
+        mount.exfat-fuse -o ro "$dev" "$mnt" 2>/dev/null
+    else
+        mount -o ro "$dev" "$mnt" 2>/dev/null
+    fi || { fail "Could not mount $fs partition $dev"; rmdir "$mnt"; return; }
+    for f in $visible; do check_file_on_mount "$mnt" "$f"; done
+    for f in $hidden; do
+        if [ ! -e "$mnt/$f" ] && ! ls -a "$mnt/$(dirname "$f")" | grep -qx "$(basename "$f")"; then
+            pass "$f hidden from mounted filesystem"
+        else
+            fail "$f should be hidden but is visible"
+        fi
+    done
+    cleanup_mount "$mnt"
+    sleep 1  # let the FUSE driver release the device
+}
+
+IMG="/output/example_countermeasures/training_countermeasures.img"
+if [ ! -f "$IMG" ]; then
+    fail "Image not found: $IMG"
+else
+    LOOP=$(losetup --find --show "$IMG")
+    kpartx -a "$LOOP"
+    LOOPBASE=$(basename "$LOOP")
+    P="/dev/mapper/${LOOPBASE}p"
+
+    echo ""
+    echo "  --- Partition 1: FAT32 fat_dir_zero ---"
+    check_hidden_on_mount "${P}1" fat32 "text1.txt zip1.zip images/pic1.jpg" "doc1.docx copyofdocument1.docx"
+    for f in doc1.docx copyofdocument1.docx; do
+        check "$f name still in raw directory entries" raw_has_name "${P}1" "$f"
+    done
+
+    echo ""
+    echo "  --- Partition 2: exFAT fat_dir_zero ---"
+    check_hidden_on_mount "${P}2" exfat "copyofdocument1.docx text1.txt zip1.zip images/pic1.jpg" "doc1.docx"
+    check "doc1.docx name still in raw directory entries" raw_has_name "${P}2" doc1.docx
+
+    echo ""
+    echo "  --- Partition 3: NTFS ntfs_index_flag ---"
+    check_hidden_on_mount "${P}3" ntfs "doc1.docx copyofdocument1.docx text1.txt images/pic1.jpg" "zip1.zip"
+    check "TSK still lists zip1.zip" bash -c "fls '${P}3' | grep -q 'zip1.zip'"
+    check "ntfsfix accepts the volume" ntfsfix -n "${P}3"
+
+    echo ""
+    echo "  --- Partition 4: NTFS ntfs_index_truncate ---"
+    check_hidden_on_mount "${P}4" ntfs "doc1.docx copyofdocument1.docx images/pic1.jpg" "text1.txt zip1.zip"
+    for f in text1.txt zip1.zip; do
+        check "TSK recovers $f from index slack (unallocated name)" bash -c "fls '${P}4' | grep -qE '^-/r .*$f$'"
+    done
+
+    kpartx -d "$LOOP"
+    losetup -d "$LOOP"
+fi
+
+# Same methods on a subdirectory (/images). The small NTFS directory keeps its
+# index resident in the MFT record instead of an INDX block.
+IMG="/output/example_countermeasures/training_countermeasures_subdir.img"
+if [ ! -f "$IMG" ]; then
+    fail "Image not found: $IMG"
+else
+    LOOP=$(losetup --find --show "$IMG")
+    kpartx -a "$LOOP"
+    LOOPBASE=$(basename "$LOOP")
+    P="/dev/mapper/${LOOPBASE}p"
+    # Each partition has two countermeasures: /images hides pic1.jpg, / hides one root entry
+    SUB_VISIBLE="doc1.docx text1.txt images/doc1.docx images/copyofdocument1.docx"
+
+    echo ""
+    echo "  --- Subdirectory, partition 1: FAT32, hides /images itself and /images/pic1.jpg ---"
+    check_hidden_on_mount "${P}1" fat32 "doc1.docx text1.txt zip1.zip" "images"
+    check "pic1.jpg name still in raw directory entries" raw_has_name "${P}1" pic1.jpg
+    check "images name still in raw directory entries" raw_has_name "${P}1" images
+
+    echo ""
+    echo "  --- Subdirectory, partition 2: exFAT fat_dir_zero ---"
+    check_hidden_on_mount "${P}2" exfat "$SUB_VISIBLE" "images/pic1.jpg zip1.zip"
+    check "pic1.jpg name still in raw directory entries" raw_has_name "${P}2" pic1.jpg
+
+    echo ""
+    echo "  --- Subdirectory, partition 3: NTFS ntfs_index_flag ---"
+    check_hidden_on_mount "${P}3" ntfs "$SUB_VISIBLE" "images/pic1.jpg zip1.zip"
+    check "TSK still lists images/pic1.jpg" bash -c "fls '${P}3' \$(ifind -n images '${P}3') | grep -q 'pic1.jpg'"
+    check "ntfsfix accepts the volume" ntfsfix -n "${P}3"
+
+    echo ""
+    echo "  --- Subdirectory, partition 4: NTFS, truncate in /images and flag in / ---"
+    check_hidden_on_mount "${P}4" ntfs "$SUB_VISIBLE" "images/pic1.jpg zip1.zip"
+    check "TSK recovers images/pic1.jpg from index slack (unallocated name)" bash -c "fls '${P}4' \$(ifind -n images '${P}4') | grep -qE '^-/r .*pic1.jpg$'"
+    check "TSK still lists zip1.zip (flag method)" bash -c "fls '${P}4' | grep -qE '^r/r .*zip1.zip$'"
+    check "ntfsfix accepts the volume" ntfsfix -n "${P}4"
+
+    kpartx -d "$LOOP"
+    losetup -d "$LOOP"
+fi
+
+# ============================================================
+echo ""
+echo "=========================================="
 echo " RESULTS"
 echo "=========================================="
 echo "  Total:  $TESTS"

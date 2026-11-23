@@ -45,3 +45,14 @@ For each FS and method, run an example manifest in `examples/` plus `test/verify
 2. The hidden filenames are still present in the raw directory or index bytes (recoverable).
 3. The visible files still list and read correctly.
 4. The image still mounts without error.
+
+## As built (2026-11-20)
+- Manifest: a single `countermeasure` object per partition (or per RAW disk), not a list, and root directory only (no `path`). Types: `fat_dir_zero`, `ntfs_index_flag`, `ntfs_index_truncate`.
+- Code: `diskforge/countermeasures.py`, called from `DiskImage.apply_countermeasures()` after populate and before inject. LUKS doesn't apply, because LUKS only allows ext/xfs/btrfs/f2fs. VeraCrypt full-disk is rejected in validation.
+- FAT32/exFAT: hidden entry groups are moved after the visible ones, so the order of writes doesn't matter. The first byte of EVERY hidden slot is zeroed, not just the first one, because Linux vfat treats 0x00 as a free slot and keeps scanning, while Windows stops at it.
+- NTFS truncate: the hidden entries are shifted 16 bytes and a real END entry is written at the cut, then bytes-in-use is reduced. Every hidden entry survives intact in slack.
+- NTFS supported layout: an `$INDEX_ROOT` holding only an END entry that points to one leaf INDX block (the normal layout for a mkntfs root). Anything else fails loud.
+- A FUSE wait: ntfs-3g and exfat-fuse keep running after `umount` returns, so the code waits until no process has the device on its command line.
+- Observed: TSK `fls` lists `ntfs_index_flag` files as allocated and `ntfs_index_truncate` files as deleted (from slack). It doesn't list FAT/exFAT hidden entries at all.
+- Subdirectories (added 2026-11-20): an optional `path` (default `/`). FAT32/exFAT walk directory entries; exFAT handles NoFatChain (contiguous) directories. NTFS maps MFT records through the `$MFT` `$DATA` runlist and also supports a resident `$INDEX_ROOT` leaf, the usual layout for small directories. Truncate now writes the new END over the old 16-byte END, so it needs no slack space and works in resident indexes.
+- Several directories (added 2026-11-21): `countermeasure` accepts an object or a list, with at most one entry per directory. Entries are applied deepest path first, so hiding a folder can't break the path lookup for an entry beneath it. The NTFS one-method rule now applies per directory.

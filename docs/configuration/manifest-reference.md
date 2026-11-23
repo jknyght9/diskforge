@@ -99,6 +99,7 @@ RAW disks have no `partitions` array. The `filesystem`, `label`, and `populate` 
 | `bootable` | boolean | No | Mark partition as bootable |
 | `encrypt` | object | No | Partition-level encryption (LUKS only) |
 | `populate` | object | No | File population rules |
+| `countermeasure` | object or array | No | Hide directory entries (see [Countermeasures](countermeasures.md)) |
 
 ### Extended Partitions (MBR Only)
 
