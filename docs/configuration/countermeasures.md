@@ -1,6 +1,6 @@
 # Filesystem Countermeasures
 
-Hide files in a directory by editing on-disk directory structures, the way an anti-forensics tool would. The files and their data stay on disk, but the operating system no longer lists them. Students have to find them with raw analysis (a hex editor, TSK, or carving directory entries).
+Hide files in a directory by editing on-disk directory structures, the way an anti-forensics tool would. The files and their data stay on disk, but the operating system no longer lists them. Students have to find them with raw analysis: a hex editor or carving directory entries for FAT32 and exFAT, and TSK for NTFS.
 
 | Type | Filesystems | What it changes |
 |------|-------------|-----------------|
@@ -27,6 +27,8 @@ Countermeasures run after every partition is populated and unmounted, and before
 A FAT directory is a list of 32-byte entries, and a first byte of `0x00` means "no more entries". DiskForge moves the hidden files' entries (including FAT32 long-filename entries and the full exFAT entry set) to the end of the directory, after the visible ones, and then zeroes the first byte of each hidden entry. Windows stops reading at the first zeroed entry. Linux skips each one as free. The rest of every entry, including the name, timestamps, starting cluster and size, is left intact, and so is the file data.
 
 The order you list files in `hide` doesn't matter. Any entries in the directory can be hidden.
+
+TSK stops at the zeroed byte too: `fls` and `fls -d` don't list the hidden entries at all, not even as deleted. The only way to find them is to read the directory's clusters in a hex editor.
 
 ### NTFS (`ntfs_index_flag`, `ntfs_index_truncate`)
 
