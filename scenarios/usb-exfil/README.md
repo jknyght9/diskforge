@@ -35,8 +35,6 @@ docker run --rm --privileged \
 
 Output: `output/usb_exfil.img` (256MB)
 
-`files/zz_ledger.xlsx` is a CSV placeholder, not a real spreadsheet.
-
 ## Learning Objectives
 
 - GPT partition analysis with `mmls`

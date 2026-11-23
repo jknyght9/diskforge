@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f1226"/>
+      <stop offset="1" stop-color="#1a1f4a"/>
+    </linearGradient>
+    <linearGradient id="fade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0f1226" stop-opacity="1"/>
+      <stop offset="0.55" stop-color="#0f1226" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#0f1226" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="640" fill="url(#bg)"/>
+
+  <!-- hex dump backdrop -->
+  <g font-family="Menlo, Monaco, monospace" font-size="17" fill="#5c6bc0" opacity="0.28">
+    <text x="560" y="70">00000000  eb 58 90 4d 53 44 4f 53  35 2e 30 00 02 08 20 00</text>
+    <text x="560" y="98">00000200  45 46 49 20 50 41 52 54  00 00 01 00 5c 00 00 00</text>
+    <text x="560" y="126">00004400  4e 54 46 53 20 20 20 20  00 02 08 00 00 00 00 00</text>
+    <text x="560" y="154">00100000  e5 41 4c 45 44 47 45 52  58 4c 53 20 00 00 00 00</text>
+    <text x="560" y="182">00100400  00 4f 54 45 53 20 20 20  54 58 54 20 18 00 00 00</text>
+    <text x="560" y="210">00200000  46 49 4c 45 30 00 03 00  00 00 00 00 00 00 00 00</text>
+    <text x="560" y="238">00200400  49 4e 44 58 28 00 09 00  00 00 00 00 00 00 00 00</text>
+    <text x="560" y="266">00400000  4c 55 4b 53 ba be 00 02  00 00 00 00 00 00 40 00</text>
+    <text x="560" y="294">00800000  53 ef 01 00 01 00 00 00  00 00 00 00 00 00 00 00</text>
+    <text x="560" y="322">00c00000  50 4b 03 04 14 00 06 00  08 00 00 00 21 00 62 ee</text>
+    <text x="560" y="350">01000000  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00</text>
+  </g>
+  <rect width="1280" height="640" fill="url(#fade)"/>
+
+  <!-- title -->
+  <text x="96" y="230" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="112" font-weight="700" fill="#ffffff" letter-spacing="-2">Disk<tspan fill="#8c9eff">Forge</tspan></text>
+  <text x="100" y="290" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="34" fill="#c5cae9">Forensics training disk images from JSON manifests</text>
+
+  <!-- partition map -->
+  <g font-family="Menlo, Monaco, monospace" font-size="16" font-weight="700" fill="#0f1226">
+    <rect x="100" y="350" width="56" height="56" rx="6" fill="#7986cb"/>
+    <text x="128" y="384" text-anchor="middle" fill="#0f1226">GPT</text>
+    <rect x="164" y="350" width="234" height="56" rx="6" fill="#8c9eff"/>
+    <text x="281" y="384" text-anchor="middle">FAT32</text>
+    <rect x="406" y="350" width="300" height="56" rx="6" fill="#b388ff"/>
+    <text x="556" y="384" text-anchor="middle">NTFS</text>
+    <rect x="714" y="350" width="260" height="56" rx="6" fill="#ffab40"/>
+    <text x="844" y="384" text-anchor="middle">LUKS / ext4</text>
+    <rect x="982" y="350" width="198" height="56" rx="6" fill="none" stroke="#5c6bc0" stroke-width="2" stroke-dasharray="6 6"/>
+    <text x="1081" y="384" text-anchor="middle" fill="#8c9eff">unallocated</text>
+  </g>
+
+  <!-- features -->
+  <g font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" fill="#e8eaf6" xml:space="preserve">
+    <text x="100" y="478">MBR / GPT / RAW  ·  LUKS and VeraCrypt  ·  OS templates  ·  Anti-forensics</text>
+    <text x="100" y="518">Data injection  ·  AI analysis watermark  ·  MCP server  ·  Docker</text>
+  </g>
+  <text x="100" y="590" font-family="Menlo, Monaco, monospace" font-size="22" fill="#7986cb">github.com/jknyght9/diskforge</text>
+</svg>
