@@ -4,7 +4,7 @@
 
 **DiskForge** is a Python-based tool for generating partitioned and encrypted disk images for digital forensics training, incident response simulations, CTF challenges, and lab environments.
 
-Define disk layouts, filesystems, encryption, OS templates, and file population rules in a JSON manifest — then build reproducible disk images with a single Docker command.
+Define disk layouts, filesystems, encryption, OS templates, and file population rules in a JSON manifest, then build reproducible disk images with a single Docker command.
 
 **[Full Documentation](https://jknyght9.github.io/diskforge)**
 
@@ -26,7 +26,7 @@ Define disk layouts, filesystems, encryption, OS templates, and file population 
 - File population with add, copy, move, and delete operations
 - Wildcard and glob pattern support for file operations
 - Multi-disk builds from a single manifest
-- Automated test and verification suite (99 checks)
+- Automated test and verification suite (172 build checks + 15 MCP checks)
 - Dockerized and reproducible (amd64 + arm64)
 
 ---
@@ -105,7 +105,7 @@ Apply realistic directory structures before populating with evidence files:
 | `linux` | Linux | ext4 | FHS layout, /var/log, /etc, /home, cron, SSH |
 | `macos` | macOS | HFS+ | /Library, /System, LaunchAgents, FSEvents, Spotlight |
 
-Templates create directories and forensic-relevant stub files (registry hives, log paths, system binaries). Custom templates are JSON files — see [Template Docs](https://jknyght9.github.io/diskforge/configuration/templates/).
+Templates create directories and forensic-relevant stub files (registry hives, log paths, system binaries). Custom templates are JSON files; see [Template Docs](https://jknyght9.github.io/diskforge/configuration/templates/).
 
 ---
 
@@ -138,7 +138,7 @@ Placed at the disk level, not the partition level.
 
 ## RAW Disks (Superfloppy)
 
-Disks with no partition table — filesystem written directly to the device:
+Disks with no partition table, with the filesystem written directly to the device:
 
 ```json
 {
@@ -180,7 +180,7 @@ bash test/test.sh
 mcp_server/.venv/bin/python test/test_mcp.py   # MCP server checks (see docs/usage/mcp.md)
 ```
 
-Builds all 9 example images, then runs 99 verification checks: partition tables, file contents, encryption passphrase validation (correct + wrong), boot code, template directories, and stub files.
+`test.sh` builds all 11 example scenarios, then runs 172 verification checks: partition tables, file contents, encryption passphrase validation (correct + wrong), boot code, template directories and stub files, unallocated injection, hidden directory entries (mount, raw bytes, TSK, `ntfsfix`), and watermark placement. `test_mcp.py` drives the MCP server through a real client and runs 15 checks, including a full build.
 
 ---
 
@@ -195,6 +195,9 @@ Builds all 9 example images, then runs 99 verification checks: partition tables,
 │   ├── partitioning.py  # MBR/GPT partitioning, formatting, boot code
 │   ├── populator.py     # File population (template/add/copy/move/delete)
 │   ├── templates.py     # OS template loader and applicator
+│   ├── injector.py      # Unallocated space injection
+│   ├── countermeasures.py # FAT/exFAT/NTFS directory entry hiding
+│   ├── watermark.py     # AI analysis notice and canary GUID
 │   ├── manifest.py      # Manifest loading and validation
 │   └── utils.py         # Utility functions
 ├── mcp_server/          # MCP server (validate and build through Docker)
@@ -208,18 +211,33 @@ Builds all 9 example images, then runs 99 verification checks: partition tables,
 
 ---
 
+## MCP Server
+
+Validate and build manifests from Claude Code, Claude Desktop, or any MCP client. The server runs on the host and starts the `diskforge` image for each call. It builds images only; it has no tools for analyzing them.
+
+```bash
+python3 -m venv mcp_server/.venv && mcp_server/.venv/bin/pip install -e mcp_server
+claude mcp add diskforge -- "$(pwd)/mcp_server/.venv/bin/python" "$(pwd)/mcp_server/server.py"
+```
+
+Tools: `validate_manifest`, `build`, `list_templates`, `list_examples`. See [MCP Server Docs](https://jknyght9.github.io/diskforge/usage/mcp/).
+
+---
+
 ## Requirements
 
 - Docker (Desktop or Engine)
+- Python 3.10+ (MCP server only)
 - `--privileged` flag required for loop device and partition operations
 
 ---
 
 ## To Do
 
-- ZFS support (complex packaging — kernel module + userspace tools)
+- ZFS support (complex packaging: kernel module + userspace tools)
 - Investigate BitLocker support (requires Windows tooling)
 - APFS support (no Linux implementation exists)
+- Upgrade the container from Debian Bullseye ([#8](https://github.com/jknyght9/diskforge/issues/8))
 
 ---
 
