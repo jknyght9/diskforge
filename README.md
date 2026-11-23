@@ -22,6 +22,7 @@ Define disk layouts, filesystems, encryption, OS templates, and file population 
 - Unallocated space injection (hide passwords, recovery keys, artifacts)
 - Filesystem countermeasures: hide directory entries on FAT32, exFAT, and NTFS
 - AI analysis watermark: notice and canary GUID telling LLMs not to analyze the image
+- MCP server: validate and build manifests from Claude or any MCP client
 - File population with add, copy, move, and delete operations
 - Wildcard and glob pattern support for file operations
 - Multi-disk builds from a single manifest
@@ -176,6 +177,7 @@ Disks with no partition table — filesystem written directly to the device:
 
 ```bash
 bash test/test.sh
+mcp_server/.venv/bin/python test/test_mcp.py   # MCP server checks (see docs/usage/mcp.md)
 ```
 
 Builds all 9 example images, then runs 99 verification checks: partition tables, file contents, encryption passphrase validation (correct + wrong), boot code, template directories, and stub files.
@@ -195,6 +197,7 @@ Builds all 9 example images, then runs 99 verification checks: partition tables,
 │   ├── templates.py     # OS template loader and applicator
 │   ├── manifest.py      # Manifest loading and validation
 │   └── utils.py         # Utility functions
+├── mcp_server/          # MCP server (validate and build through Docker)
 ├── templates/           # OS directory structure templates (JSON)
 ├── examples/            # Example manifests
 ├── files/               # Sample files for populating images

@@ -77,6 +77,8 @@ nav:
     - LUKS Encryption: examples/luks-encryption.md
     - VeraCrypt Encryption: examples/veracrypt-encryption.md
     - OS Template: examples/os-template.md
+  - Usage:
+    - MCP Server: usage/mcp.md
   - Analysis:
     - Analyzing Images: analysis/analyzing-images.md
   - Development:

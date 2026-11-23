@@ -18,3 +18,7 @@ site/
 # AI context
 CLAUDE.md
 .claude/
+
+# MCP server virtualenv
+mcp_server/.venv/
+*.egg-info/

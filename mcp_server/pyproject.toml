@@ -1,0 +1,6 @@
+[project]
+name = "diskforge-mcp"
+version = "0.1.0"
+description = "MCP server that validates and builds DiskForge manifests through the diskforge Docker image"
+requires-python = ">=3.10"
+dependencies = ["mcp>=2.3,<3"]
