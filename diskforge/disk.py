@@ -196,6 +196,9 @@ class DiskImage:
         self.disk["number"] = 0
 
     def populate(self):
+        if self.disk.get("watermark"):
+            from .watermark import prepare_watermark
+            prepare_watermark(self.disk)
         populate_disk(self.disk)
 
     def apply_countermeasures(self):
@@ -215,6 +218,11 @@ class DiskImage:
         if self.disk.get("inject"):
             from .injector import inject_unallocated
             inject_unallocated(self.disk)
+
+    def watermark(self):
+        if self.disk.get("watermark"):
+            from .watermark import write_watermark
+            write_watermark(self.disk)
 
     def cleanup(self):
         print(f"[*] Cleaning up: {self.disk['name']}", file=sys.stdout, flush=True)

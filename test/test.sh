@@ -11,7 +11,7 @@ echo " PHASE 1: BUILD"
 echo "============================================"
 echo ""
 
-for scenario in example_gpt example_mbr example_luks example_veracrypt example_raw example_template example_btrfs example_f2fs example_inject example_countermeasures; do
+for scenario in example_gpt example_mbr example_luks example_veracrypt example_raw example_template example_btrfs example_f2fs example_inject example_countermeasures example_watermark; do
   echo "[*] Building: $scenario"
   docker run --rm --privileged \
     -v "$(pwd)/examples/$scenario:/output" \
@@ -37,6 +37,7 @@ docker run --rm --privileged \
   -v "$(pwd)/examples/example_f2fs:/output/example_f2fs" \
   -v "$(pwd)/examples/example_inject:/output/example_inject" \
   -v "$(pwd)/examples/example_countermeasures:/output/example_countermeasures" \
+  -v "$(pwd)/examples/example_watermark:/output/example_watermark" \
   -v "$(pwd)/test/verify.sh:/verify.sh" \
   --entrypoint bash \
   diskforge /verify.sh

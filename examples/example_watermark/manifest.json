@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0",
+  "disks": [
+    {
+      "name": "training_watermark",
+      "label": "WatermarkExample",
+      "type": "GPT",
+      "size": "128M",
+      "watermark": {
+        "owner": "IS4483 Digital Forensics",
+        "canary": "6f1c2a9e-4b7d-4e3a-9c58-2d0e8b71f4a3",
+        "file": true
+      },
+      "partitions": [
+        {
+          "number": 1,
+          "type": "primary",
+          "filesystem": "fat32",
+          "label": "USBDATA",
+          "size": "40M",
+          "populate": { "add_files": [{ "source": "/files/*.docx", "target": "/" }] }
+        },
+        {
+          "number": 2,
+          "type": "primary",
+          "filesystem": "ntfs",
+          "label": "EVIDENCE",
+          "size": "60M"
+        }
+      ]
+    },
+    {
+      "name": "training_watermark_mbr",
+      "label": "WatermarkMBR",
+      "type": "MBR",
+      "size": "128M",
+      "watermark": { "owner": "IS4483 Digital Forensics" },
+      "partitions": [
+        {
+          "number": 1,
+          "type": "primary",
+          "filesystem": "ext4",
+          "label": "ROOT",
+          "size": "40M",
+          "populate": { "add_files": [{ "source": "/files/text1.txt", "target": "/" }] }
+        },
+        {
+          "number": 2,
+          "type": "extended",
+          "filesystem": "none",
+          "size": "60M",
+          "partitions": [
+            { "number": 5, "type": "logical", "filesystem": "ext4", "label": "DATA", "size": "40M" }
+          ]
+        }
+      ],
+      "inject": [
+        { "location": "unallocated", "data": "password: Tr4ining!S3cret#2025", "offset": 0 }
+      ]
+    }
+  ]
+}

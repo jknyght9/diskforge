@@ -37,6 +37,8 @@ def validate_manifest(disks):
                 _validate_template(template_name, disk["name"], "raw")
             if disk.get("countermeasure"):
                 _validate_countermeasures(disk["countermeasure"], disk["filesystem"], disk["name"], "raw")
+            if disk.get("watermark"):
+                fail(f"Watermark is not supported on RAW disk '{disk['name']}' (no partition table gap or unallocated space)")
             continue
 
         # MBR/GPT disks require partitions
@@ -123,6 +125,11 @@ def validate_manifest(disks):
                     fail(f"Countermeasures are not supported on VeraCrypt-encrypted disk '{disk['name']}'")
                 _validate_countermeasures(part["countermeasure"], fs, disk["name"], part["number"])
 
+        if disk.get("watermark"):
+            if disk_encrypt == "veracrypt":
+                fail(f"Watermark is not supported on VeraCrypt-encrypted disk '{disk['name']}'")
+            _validate_watermark(disk["watermark"], disk["name"])
+
         # Validate inject entries
         for entry in disk.get("inject", []):
             if entry.get("location") != "unallocated":
@@ -178,6 +185,22 @@ def _validate_countermeasure(cm, fs, disk_name, part_id):
     path = cm.get("path", "/")
     if not isinstance(path, str) or any(p in (".", "..") for p in path.split("/")):
         fail(f"Countermeasure in {where}: 'path' must be a directory path like \"/Documents\"")
+
+def _validate_watermark(wm, disk_name):
+    """Check a watermark block: owner or custom text, optional canary string, optional file flag."""
+    from .watermark import build_notice, GAP_START, GAP_END
+    where = f"Watermark in disk '{disk_name}'"
+    if not isinstance(wm, dict):
+        fail(f"{where} must be an object")
+    for field in ("owner", "text", "canary"):
+        if field in wm and (not isinstance(wm[field], str) or not wm[field].strip()):
+            fail(f"{where}: '{field}' must be a non-empty string")
+    if not wm.get("owner") and not wm.get("text"):
+        fail(f"{where} requires 'owner' (used in the standard notice) or a custom 'text'")
+    if "file" in wm and not isinstance(wm["file"], bool):
+        fail(f"{where}: 'file' must be true or false")
+    if len(build_notice(wm)[1]) > GAP_END - GAP_START:
+        fail(f"{where}: notice is longer than the {GAP_END - GAP_START} bytes available before the first partition")
 
 def _validate_template(template_name, disk_name, part_id):
     """Check that a template JSON file exists."""

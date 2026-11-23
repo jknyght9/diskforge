@@ -22,6 +22,7 @@ class DiskForge:
                 image.populate()
                 image.apply_countermeasures()
                 image.inject()
+                image.watermark()
             except Exception as e:
                 print(f"[!] Failed to build disk {disk['name']}: {e}", file=sys.stderr)
                 raise

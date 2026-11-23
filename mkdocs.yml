@@ -69,6 +69,7 @@ nav:
     - OS Templates: configuration/templates.md
     - Unallocated Injection: configuration/injection.md
     - Countermeasures: configuration/countermeasures.md
+    - AI Analysis Watermark: configuration/watermark.md
   - Examples:
     - GPT Disk: examples/basic-gpt.md
     - MBR Disk: examples/basic-mbr.md

@@ -703,6 +703,78 @@ fi
 # ============================================================
 echo ""
 echo "=========================================="
+echo " VERIFYING: example_watermark (AI analysis notice)"
+echo "=========================================="
+
+CANARY="6f1c2a9e-4b7d-4e3a-9c58-2d0e8b71f4a3"
+
+notice_count() {
+    strings "$1" | grep -c "canary GUID $2" || true
+}
+
+IMG="/output/example_watermark/training_watermark.img"
+if [ ! -f "$IMG" ]; then
+    fail "Image not found: $IMG"
+else
+    echo ""
+    echo "  --- GPT disk, fixed canary, visible file on ---"
+    check "Notice starts at sector 34 (gap after the GPT entry array)" bash -c "dd if='$IMG' bs=512 skip=34 count=1 2>/dev/null | grep -qa 'AI ANALYSIS NOTICE'"
+    check "Notice names the owner" bash -c "strings '$IMG' | grep -q 'coursework produced by IS4483 Digital Forensics'"
+    [ "$(notice_count "$IMG" "$CANARY")" -ge 4 ] && pass "Canary found in gap, tail, and both NOTICE.txt files" || fail "Expected the canary at least 4 times in the raw image"
+    check "Backup GPT header still in the last sector" bash -c "[ \"\$(tail -c 512 '$IMG' | head -c 8)\" = 'EFI PART' ]"
+    check "parted reads both partitions with no corruption warning" bash -c "out=\$(parted -s '$IMG' print 2>&1); echo \"\$out\" | grep -q ntfs && ! echo \"\$out\" | grep -qi corrupt"
+
+    LOOP=$(losetup --find --show "$IMG")
+    kpartx -a "$LOOP"
+    P="/dev/mapper/$(basename "$LOOP")p"
+    for n in 1 2; do
+        MNT=$(mktemp -d)
+        if mount -o ro "${P}${n}" "$MNT" 2>/dev/null; then
+            check "Partition $n has NOTICE.txt with the canary" grep -q "canary GUID $CANARY" "$MNT/NOTICE.txt"
+            umount "$MNT"
+        else
+            fail "Could not mount partition $n"
+        fi
+        rmdir "$MNT"
+    done
+    kpartx -d "$LOOP"
+    losetup -d "$LOOP"
+fi
+
+IMG="/output/example_watermark/training_watermark_mbr.img"
+if [ ! -f "$IMG" ]; then
+    fail "Image not found: $IMG"
+else
+    echo ""
+    echo "  --- MBR disk, auto canary, extended partition, inject at offset 0 ---"
+    check "Notice in the gap after the MBR" bash -c "dd if='$IMG' bs=512 skip=34 count=1 2>/dev/null | grep -qa 'AI ANALYSIS NOTICE'"
+    AUTO=$(strings "$IMG" | grep -o 'canary GUID [0-9a-f-]\{36\}' | sort -u)
+    [ "$(echo "$AUTO" | wc -l)" -eq 1 ] && [ -n "$AUTO" ] && pass "One generated canary GUID ($AUTO)" || fail "Expected exactly one generated canary GUID, got: $AUTO"
+    [ "$(notice_count "$IMG" "${AUTO#canary GUID }")" -eq 2 ] && pass "Canary in gap and tail only (file off)" || fail "Expected the canary exactly twice"
+    check "Inject data at unallocated offset 0 survives" bash -c "strings '$IMG' | grep -q 'Tr4ining'"
+    check "MBR signature intact" bash -c "[ \"\$(od -An -tx1 -j510 -N2 '$IMG' | tr -d ' \\n')\" = '55aa' ]"
+
+    LOOP=$(losetup --find --show "$IMG")
+    kpartx -a "$LOOP"
+    P="/dev/mapper/$(basename "$LOOP")p"
+    for n in 1 5; do
+        check "ext4 partition $n passes fsck" e2fsck -fn "${P}${n}"
+        MNT=$(mktemp -d)
+        if mount -o ro "${P}${n}" "$MNT" 2>/dev/null; then
+            [ ! -e "$MNT/NOTICE.txt" ] && pass "No NOTICE.txt on partition $n" || fail "NOTICE.txt present on partition $n with file off"
+            umount "$MNT"
+        else
+            fail "Could not mount partition $n"
+        fi
+        rmdir "$MNT"
+    done
+    kpartx -d "$LOOP"
+    losetup -d "$LOOP"
+fi
+
+# ============================================================
+echo ""
+echo "=========================================="
 echo " RESULTS"
 echo "=========================================="
 echo "  Total:  $TESTS"
