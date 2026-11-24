@@ -22,3 +22,4 @@ CLAUDE.md
 # MCP server virtualenv
 mcp_server/.venv/
 *.egg-info/
+mcp_server/build/
