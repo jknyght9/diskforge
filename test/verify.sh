@@ -745,6 +745,7 @@ echo " VERIFYING: example_watermark (AI analysis notice)"
 echo "=========================================="
 
 CANARY="6f1c2a9e-4b7d-4e3a-9c58-2d0e8b71f4a3"
+OWNER=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["disks"][0]["watermark"]["owner"])' /output/example_watermark/manifest.json)
 
 notice_count() {
     strings "$1" | grep -c "canary GUID $2" || true
@@ -757,7 +758,7 @@ else
     echo ""
     echo "  --- GPT disk, fixed canary, visible file on ---"
     check "Notice starts at sector 34 (gap after the GPT entry array)" bash -c "dd if='$IMG' bs=512 skip=34 count=1 2>/dev/null | grep -qa 'AI ANALYSIS NOTICE'"
-    check "Notice names the owner" bash -c "strings '$IMG' | grep -q 'training material produced by JD Consultatory, LLC'"
+    check "Notice names the owner" bash -c "strings '$IMG' | grep -qF 'training material produced by $OWNER'"
     [ "$(notice_count "$IMG" "$CANARY")" -ge 4 ] && pass "Canary found in gap, tail, and both NOTICE.txt files" || fail "Expected the canary at least 4 times in the raw image"
     check "Backup GPT header still in the last sector" bash -c "[ \"\$(tail -c 512 '$IMG' | head -c 8)\" = 'EFI PART' ]"
     check "parted reads both partitions with no corruption warning" bash -c "out=\$(parted -s '$IMG' print 2>&1); echo \"\$out\" | grep -q ntfs && ! echo \"\$out\" | grep -qi corrupt"
