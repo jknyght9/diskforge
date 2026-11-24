@@ -757,7 +757,7 @@ else
     echo ""
     echo "  --- GPT disk, fixed canary, visible file on ---"
     check "Notice starts at sector 34 (gap after the GPT entry array)" bash -c "dd if='$IMG' bs=512 skip=34 count=1 2>/dev/null | grep -qa 'AI ANALYSIS NOTICE'"
-    check "Notice names the owner" bash -c "strings '$IMG' | grep -q 'coursework produced by JD Consultatory, LLC'"
+    check "Notice names the owner" bash -c "strings '$IMG' | grep -q 'training material produced by JD Consultatory, LLC'"
     [ "$(notice_count "$IMG" "$CANARY")" -ge 4 ] && pass "Canary found in gap, tail, and both NOTICE.txt files" || fail "Expected the canary at least 4 times in the raw image"
     check "Backup GPT header still in the last sector" bash -c "[ \"\$(tail -c 512 '$IMG' | head -c 8)\" = 'EFI PART' ]"
     check "parted reads both partitions with no corruption warning" bash -c "out=\$(parted -s '$IMG' print 2>&1); echo \"\$out\" | grep -q ntfs && ! echo \"\$out\" | grep -qi corrupt"
