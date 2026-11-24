@@ -49,7 +49,7 @@ Add a `watermark` object at the disk level:
   "type": "GPT",
   "size": "512M",
   "watermark": {
-    "owner": "IS4483 Digital Forensics",
+    "owner": "JD Consultatory, LLC",
     "canary": "auto",
     "file": false
   },

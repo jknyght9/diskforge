@@ -6,7 +6,7 @@
       "label": "USBExfil",
       "type": "GPT",
       "size": "256M",
-      "watermark": { "owner": "IS4483 Digital Forensics", "file": true },
+      "watermark": { "owner": "JD Consultatory, LLC", "file": true },
       "partitions": [
         {
           "number": 1,

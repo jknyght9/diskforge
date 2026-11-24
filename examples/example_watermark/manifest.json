@@ -7,7 +7,7 @@
       "type": "GPT",
       "size": "128M",
       "watermark": {
-        "owner": "IS4483 Digital Forensics",
+        "owner": "JD Consultatory, LLC",
         "canary": "6f1c2a9e-4b7d-4e3a-9c58-2d0e8b71f4a3",
         "file": true
       },
@@ -34,7 +34,7 @@
       "label": "WatermarkMBR",
       "type": "MBR",
       "size": "128M",
-      "watermark": { "owner": "IS4483 Digital Forensics" },
+      "watermark": { "owner": "JD Consultatory, LLC" },
       "partitions": [
         {
           "number": 1,
